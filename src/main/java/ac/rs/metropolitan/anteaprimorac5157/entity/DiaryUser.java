@@ -20,6 +20,16 @@ public class DiaryUser {
     @Column(name = "is_admin", nullable = false)
     private Boolean isAdmin;
 
+    public DiaryUser() {
+    }
+
+    public DiaryUser(Integer id, String username, String password, Boolean isAdmin) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.isAdmin = isAdmin;
+    }
+
     public String getPassword() {
         return password;
     }

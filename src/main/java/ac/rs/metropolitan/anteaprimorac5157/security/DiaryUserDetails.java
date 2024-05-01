@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class DiaryUserDetails implements UserDetails {
 
@@ -57,5 +58,18 @@ public class DiaryUserDetails implements UserDetails {
     // DiaryUser tablica nema enabled atribut, pa su svi korisnici u ovoj aplikaciji "enabled"
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DiaryUserDetails that = (DiaryUserDetails) o;
+        return Objects.equals(diaryUser, that.diaryUser);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(diaryUser);
     }
 }
