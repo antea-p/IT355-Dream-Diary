@@ -18,7 +18,7 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests(auth -> auth
                         // /login endpoint i statički resursi (slike i CSS) su dostupni svima
-                        .requestMatchers("/login", "/*.css", "/*.png", "/*.jpg", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/*.css", "/*.png", "/*.jpg", "/favicon.ico").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

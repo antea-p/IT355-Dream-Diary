@@ -11,9 +11,13 @@
 <article class="content-box">
     <div>
         <h1>~ 𝓓𝓻𝓮𝓪𝓶 𝓓𝓲𝓪𝓻𝔂 ~</h1>
-        <p>
+        <div th:if="${isLoggedIn}">
+            <p th:text="'Hello, ' + ${username} + '!'"></p>
+            <form action="/logout" method="post">
+                <input type="submit" value="Logout">
+            </form>
+        </div>
             Nothing is real, there's nothing to get hung about...
-        </p>
     </div>
 </article>
 
