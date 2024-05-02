@@ -82,6 +82,69 @@ body {
 /*}*/
 
 
+form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #3a003a;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 0 10px #FFFFFF inset;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background: transparent;
+    border: 1px solid #FFFFFF;
+    border-radius: 5px;
+    color: #E0E0E0;
+    font-family: 'Quicksand', sans-serif;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    outline: none;
+    border-color: #FF66CC;
+    box-shadow: 0 0 5px #FF66CC;
+}
+
+button, input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #FF66CC;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #ff99cc;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: #FFFFFF;
+    font-family: 'Quicksand', sans-serif;
+    position: relative;
+    box-shadow: 0 0 10px #FFFFFF inset;
+}
+
+.alert-success {
+    background-color: #004d00;
+    border-color: #007700;
+}
+
+.alert-error {
+    background-color: #660000;
+    border-color: #990000;
+}
+
 header, footer {
     background-color: #440044;
     color: white;
@@ -108,5 +171,10 @@ a:hover, a:focus {
     nav ul li {
         /* Dodaje prostor između stavki u mobilnom pogledu */
         margin-bottom: 10px;
+    }
+
+    form {
+        width: 90%;
+        padding: 10px;
     }
 }
