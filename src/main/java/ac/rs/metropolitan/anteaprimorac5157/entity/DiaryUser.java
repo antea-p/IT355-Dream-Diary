@@ -2,6 +2,8 @@ package ac.rs.metropolitan.anteaprimorac5157.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "users", schema = "dream_diary")
 public class DiaryUser {
@@ -9,7 +11,7 @@ public class DiaryUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
-    private Integer id;
+    private Integer id; // TODO: možda Long, treba vidjeti
 
     @Column(name = "username", nullable = false, length = 50)
     private String username;
@@ -56,5 +58,19 @@ public class DiaryUser {
 
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DiaryUser diaryUser = (DiaryUser) o;
+        return Objects.equals(id, diaryUser.id) && Objects.equals(username, diaryUser.username) &&
+                Objects.equals(password, diaryUser.password) && Objects.equals(isAdmin, diaryUser.isAdmin);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, password, isAdmin);
     }
 }
