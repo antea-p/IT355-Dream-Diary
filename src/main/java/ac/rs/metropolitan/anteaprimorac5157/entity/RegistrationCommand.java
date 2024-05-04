@@ -1,7 +1,7 @@
 package ac.rs.metropolitan.anteaprimorac5157.entity;
 
 public class RegistrationCommand {
-
+    // TODO: dodati anotaciju za validaciju i, možda, nove testove
     private String username;
     private String password;
     private String repeatPassword;

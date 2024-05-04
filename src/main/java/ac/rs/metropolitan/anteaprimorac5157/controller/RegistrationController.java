@@ -4,7 +4,13 @@ import ac.rs.metropolitan.anteaprimorac5157.entity.RegistrationCommand;
 import ac.rs.metropolitan.anteaprimorac5157.exception.RegistrationFailedException;
 import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryUserRepository;
 import ac.rs.metropolitan.anteaprimorac5157.service.RegistrationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,13 +33,19 @@ public class RegistrationController {
     }
 
     @PostMapping()
-    public String register(Model model, @ModelAttribute RegistrationCommand registrationCommand) {
-        // In the POST endpoint, call RegistrationService.register.
-        // On a success, return “redirect:/”.
-        // On a failure, set the exception message as the error attribute on the model,
-        // and return the register view again.
+    public String register(Model model, @ModelAttribute RegistrationCommand registrationCommand, HttpServletRequest request) {
         try {
-            registrationService.register(registrationCommand);
+            UserDetails registeredUserDetails = registrationService.register(registrationCommand);
+            // Dohvaća novog korisnika i stavlja ga u tekuću sesiju (da bi se tretirao kao logiran korisnik)
+            Authentication auth = new UsernamePasswordAuthenticationToken(registeredUserDetails,
+                    null, registeredUserDetails.getAuthorities());
+
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(auth);
+
+            HttpSession session = request.getSession(true);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+
             return "redirect:/";
         } catch (RegistrationFailedException e) {
             model.addAttribute("error", e.getMessage());
