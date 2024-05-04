@@ -15,9 +15,10 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // TODO: hijerarhijski poredak filtera requestMatchers od najstrožeg do endpointa dostupnih svima
         http
                 .authorizeHttpRequests(auth -> auth
-                        // /login endpoint i statički resursi (slike i CSS) su dostupni svima
+                        // statički resursi (slike i CSS) su dostupni svima jer bi inače sve izgledalo kao plain HTML
                         .requestMatchers("/", "/login", "/register", "/*.css", "/*.png", "/*.jpg", "/favicon.ico").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -32,7 +33,7 @@ public class SecurityConfiguration {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                .csrf().disable();
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

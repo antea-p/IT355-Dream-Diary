@@ -25,6 +25,12 @@ public class DiaryUser {
     public DiaryUser() {
     }
 
+    public DiaryUser(String username, String password, Boolean isAdmin) {
+        this.username = username;
+        this.password = password;
+        this.isAdmin = isAdmin;
+    }
+
     public DiaryUser(Integer id, String username, String password, Boolean isAdmin) {
         this.id = id;
         this.username = username;

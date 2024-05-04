@@ -42,9 +42,8 @@ public class RegistrationService {
             throw new RegistrationFailedException("User already exists!");
         }
         else {
-            // ID će biti podešen kod umetanja u bazu podataka.
-            // save metoda vraća DiaryUser objekat sa dodijeljenim ID-jem, i to je objekt koji se vraća.
-            DiaryUser newUser = new DiaryUser(null, username, passwordEncoder.encode(password), false);
+            // ID će biti podešen kod umetanja u bazu podataka. save metoda vraća DiaryUser objekat sa dodijeljenim ID-jem.
+            DiaryUser newUser = new DiaryUser(username, passwordEncoder.encode(password), false);
             DiaryUser savedUser = diaryUserRepository.save(newUser);
             return new DiaryUserDetails(savedUser);
         }

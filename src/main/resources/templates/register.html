@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>~ 𝓓𝓻𝓮𝓪𝓶 𝓓𝓲𝓪𝓻𝔂 ~ Register</title>
+    <link th:replace="~{fragments :: css}">
+</head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+
+<div class="content-box">
+    <form name="f" th:action="@{/register}" method="post">
+        <fieldset class="register-fieldset">
+            <legend>Register</legend>
+            <div th:if="${param.error}" class="alert alert-error">
+                Registration failed!
+            </div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="input-text"/>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="input-text"/>
+            <label for="repeatPassword">Repeat Password</label>
+            <input type="password" id="repeatPassword" name="repeatPassword" class="input-text"/>
+            <div class="form-actions">
+                <button type="submit" class="btn">Register</button>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>
