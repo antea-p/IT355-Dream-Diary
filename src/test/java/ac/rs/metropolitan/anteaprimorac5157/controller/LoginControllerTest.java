@@ -16,6 +16,6 @@ class LoginControllerTest {
 
     @Test
     void testShowLoginForm() {
-        assertThat(loginController.login()).isEqualTo("login");
+        assertThat(loginController.showLogin()).isEqualTo("login");
     }
 }
