@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
-// TODO: kasnije kreirati interfejs korištenjem opcije Extract
+// TODO: kasnije kreirati interfejs korištenjem opcije Extract. Isto važi za druge servise.
 @Service
 public class RegistrationService {
 
