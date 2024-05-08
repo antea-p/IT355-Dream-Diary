@@ -20,8 +20,8 @@ public class DiaryUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return diaryUser.getIsAdmin()? List.of(new SimpleGrantedAuthority("ADMIN")) :
-            List.of(new SimpleGrantedAuthority("USER"));
+        return diaryUser.getIsAdmin()? List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) :
+            List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     // Koristit će se u provjeri prava pristupa
@@ -72,4 +72,5 @@ public class DiaryUserDetails implements UserDetails {
     public int hashCode() {
         return Objects.hash(diaryUser);
     }
+
 }
