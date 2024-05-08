@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>~ 𝓓𝓻𝓮𝓪𝓶 𝓓𝓲𝓪𝓻𝔂 ~</title>
+    <link th:replace="~{fragments :: css}">
+</head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+
+<article class="content-box">
+    <div>
+        <h1>~ 𝓨𝓸𝓾𝓻 𝓓𝓲𝓪𝓻𝔂 ~</h1>
+        <p>
+            Are you ready?
+        </p>
+
+        <!-- TODO: search, sort -->
+
+        <ul>
+            <li th:each="entry : ${diaryEntries}">
+                <h2 th:text="${entry.title}">[Title]</h2>
+                <p th:text="${#strings.abbreviate(entry.content, 32)} + '...'">[Content]</p>
+                <p th:text="${entry.createdDate}">[Date]</p>
+
+                <div>
+                    <strong>Tags:</strong>
+                    <span th:each="tag : ${entry.tags}" th:text="${tag.name}">[Tag Name]</span>
+                </div>
+
+                <div>
+                    <strong>Emotions:</strong>
+                    <span th:each="emotion : ${entry.diaryEntryEmotions}" th:text="${emotion.emotion.name}">[Emotion Name]</span>
+                </div>
+            </li>
+        </ul>
+
+        <div>
+            <a href="/diary/create" class="button">Create New Entry</a>
+        </div>
+    </div>
+</article>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>
