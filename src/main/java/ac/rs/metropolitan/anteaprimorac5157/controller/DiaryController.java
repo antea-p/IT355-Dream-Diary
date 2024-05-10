@@ -46,7 +46,13 @@ public class DiaryController {
         return "redirect:/diary";
     }
 
-    // TODO: edit i delete
+    // TODO: edit mapiranje
+
+    @GetMapping("/delete/{id}")
+    public String deleteDiaryEntry(@PathVariable Integer id) {
+        diaryEntryService.delete(id);
+        return "redirect:/diary";
+    }
 
 
     @GetMapping("/show/{id}")

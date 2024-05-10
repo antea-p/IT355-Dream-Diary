@@ -19,6 +19,9 @@ public class Emotion {
     @OneToMany(mappedBy = "emotion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DiaryEntryEmotion> diaryEntryEmotions = new ArrayList<>();
 
+    public Emotion() {
+    }
+
     public Emotion(Integer id, String name, List<DiaryEntryEmotion> diaryEntryEmotions) {
         this.id = id;
         this.name = name;
