@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Diary Entry</title>
+    <link th:replace="~{fragments :: css}">
+</head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+
+<article class="content-box">
+    <div>
+        <h1>Create Diary Entry</h1>
+        <form th:action="@{/diary/save}" th:object="${diaryEntry}" method="post">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" th:field="*{title}" required>
+                <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Content:</label>
+                <textarea id="content" th:field="*{content}" required></textarea>
+                <div class="text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+            </div>
+
+            <div>
+                <strong>Emotions:</strong>
+                <!-- TODO: hidden ul-->
+                <ul>
+                    <li th:each="emotion : ${emotions}">
+                        <input type="checkbox" th:attr="id='emotion_' + ${emotion.id}, name='emotion_' + ${emotion.id}"
+                               th:value="${emotion.id}">
+                        <span th:text="${emotion.name}">[Emotion Name]</span>
+                    </li>
+                </ul>
+            </div>
+
+<!--         TODO: tags -->
+            <button type="submit" class="button-primary">Save</button>
+
+        </form>
+
+        <div>
+            <a href="/dream-diary/list" class="button-secondary">Back to Diary List</a>
+        </div>
+
+    </div>
+</article>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>
