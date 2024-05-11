@@ -33,7 +33,8 @@
 
                 <div>
                     <strong>Emotions:</strong>
-                    <span th:each="emotion : ${entry.diaryEntryEmotions}" th:text="${emotion.emotion.name}">[Emotion Name]</span>
+                    <!-- TODO: comma separation-->
+                    <span th:each="emotion : ${entry.emotions}" th:text="${emotion.name}">[Emotion Name]</span>
                 </div>
 
             </li>

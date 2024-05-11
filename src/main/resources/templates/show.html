@@ -15,7 +15,7 @@
     <div>
         <strong>Emotions:</strong>
         <ul>
-            <li th:each="emotion : ${diaryEntry.diaryEntryEmotions}" th:text="${emotion.emotion.name}">[Emotion Name]</li>
+            <li th:each="emotion : ${diaryEntry.emotions}" th:text="${emotion.name}">[Emotion Name]</li>
         </ul>
     </div>
 

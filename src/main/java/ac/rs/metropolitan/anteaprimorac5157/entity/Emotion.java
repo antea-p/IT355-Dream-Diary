@@ -16,16 +16,12 @@ public class Emotion {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @OneToMany(mappedBy = "emotion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DiaryEntryEmotion> diaryEntryEmotions = new ArrayList<>();
-
     public Emotion() {
     }
 
-    public Emotion(Integer id, String name, List<DiaryEntryEmotion> diaryEntryEmotions) {
+    public Emotion(Integer id, String name) {
         this.id = id;
         this.name = name;
-        this.diaryEntryEmotions = diaryEntryEmotions;
     }
 
     public Integer getId() {
@@ -46,26 +42,17 @@ public class Emotion {
         return this;
     }
 
-    public List<DiaryEntryEmotion> getDiaryEntryEmotions() {
-        return diaryEntryEmotions;
-    }
-
-    public Emotion setDiaryEntryEmotions(List<DiaryEntryEmotion> diaryEntryEmotions) {
-        this.diaryEntryEmotions = diaryEntryEmotions;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Emotion emotion = (Emotion) o;
-        return Objects.equals(id, emotion.id) && Objects.equals(name, emotion.name) && Objects.equals(diaryEntryEmotions, emotion.diaryEntryEmotions);
+        return Objects.equals(id, emotion.id) && Objects.equals(name, emotion.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, diaryEntryEmotions);
+        return Objects.hash(id, name);
     }
 
     @Override
@@ -73,8 +60,6 @@ public class Emotion {
         return "Emotion{" +
                 "id=" + id +
                 ", name=" + name +
-                ", diaryEntryEmotions=" + diaryEntryEmotions +
                 '}';
     }
-
 }

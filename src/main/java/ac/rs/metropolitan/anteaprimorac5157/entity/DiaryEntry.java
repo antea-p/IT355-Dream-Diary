@@ -24,27 +24,40 @@ public class DiaryEntry {
     @Column(name = "created_date", nullable = false)
     private LocalDate createdDate;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private DiaryUser user;
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
     @OneToMany(mappedBy = "entry", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tag> tags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "entry", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DiaryEntryEmotion> diaryEntryEmotions = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "diary_entry_emotions",
+            joinColumns = @JoinColumn(name = "entry_id"),
+            inverseJoinColumns = @JoinColumn(name = "emotion_id")
+    )
+    private List<Emotion> emotions = new ArrayList<>();
 
     public DiaryEntry() {
     }
 
-    public DiaryEntry(Integer id, String title, String content, LocalDate createdDate, DiaryUser user, List<Tag> tags, List<DiaryEntryEmotion> diaryEntryEmotions) {
+    public DiaryEntry(String title, String content, LocalDate createdDate, Integer userId, List<Tag> tags, List<Emotion> emotions) {
+        this.title = title;
+        this.content = content;
+        this.createdDate = createdDate;
+        this.userId = userId;
+        this.tags = tags;
+        this.emotions = emotions;
+    }
+
+    public DiaryEntry(Integer id, String title, String content, LocalDate createdDate, Integer userId, List<Tag> tags, List<Emotion> emotions) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.createdDate = createdDate;
-        this.user = user;
+        this.userId = userId;
         this.tags = tags;
-        this.diaryEntryEmotions = diaryEntryEmotions;
+        this.emotions = emotions;
     }
 
     public Integer getId() {
@@ -74,12 +87,21 @@ public class DiaryEntry {
         return this;
     }
 
-    public DiaryUser getUser() {
-        return user;
+    public LocalDate getCreatedDate() {
+        return createdDate;
     }
 
-    public DiaryEntry setUser(DiaryUser user) {
-        this.user = user;
+    public DiaryEntry setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+        return this;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public DiaryEntry setUserId(Integer userId) {
+        this.userId = userId;
         return this;
     }
 
@@ -92,21 +114,12 @@ public class DiaryEntry {
         return this;
     }
 
-    public List<DiaryEntryEmotion> getDiaryEntryEmotions() {
-        return diaryEntryEmotions;
+    public List<Emotion> getEmotions() {
+        return emotions;
     }
 
-    public DiaryEntry setDiaryEntryEmotions(List<DiaryEntryEmotion> diaryEntryEmotions) {
-        this.diaryEntryEmotions = diaryEntryEmotions;
-        return this;
-    }
-
-    public LocalDate getCreatedDate() {
-        return createdDate;
-    }
-
-    public DiaryEntry setCreatedDate(LocalDate createdDate) {
-        this.createdDate = createdDate;
+    public DiaryEntry setEmotions(List<Emotion> emotions) {
+        this.emotions = emotions;
         return this;
     }
 
@@ -115,12 +128,12 @@ public class DiaryEntry {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DiaryEntry that = (DiaryEntry) o;
-        return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(createdDate, that.createdDate) && Objects.equals(user, that.user) && Objects.equals(tags, that.tags) && Objects.equals(diaryEntryEmotions, that.diaryEntryEmotions);
+        return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(createdDate, that.createdDate) && Objects.equals(userId, that.userId) && Objects.equals(tags, that.tags) && Objects.equals(emotions, that.emotions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, content, createdDate, user, tags, diaryEntryEmotions);
+        return Objects.hash(id, title, content, createdDate, userId, tags, emotions);
     }
 
     @Override
@@ -130,10 +143,9 @@ public class DiaryEntry {
                 ", title=" + title +
                 ", content=" + content +
                 ", createdDate=" + createdDate +
-                ", user=" + user +
+                ", userId=" + userId +
                 ", tags=" + tags +
-                ", diaryEntryEmotions=" + diaryEntryEmotions +
+                ", emotions=" + emotions +
                 '}';
     }
-
 }

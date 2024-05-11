@@ -33,13 +33,13 @@ class DiaryUserDetailsTest {
 
     @Test
     void testIfChoosesAdminRoleCorrectly() {
-        expectedRole = List.of(new SimpleGrantedAuthority("ADMIN"));
+        expectedRole = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
         assertThat(adminDiaryUserDetails.getAuthorities()).isEqualTo(expectedRole);
     }
 
     @Test
     void testIfChoosesUserRoleCorrectly() {
-        expectedRole = List.of(new SimpleGrantedAuthority("USER"));
+        expectedRole = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         assertThat(diaryUserDetails.getAuthorities()).isEqualTo(expectedRole);
     }
 }
