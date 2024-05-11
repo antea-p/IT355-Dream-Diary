@@ -23,6 +23,11 @@ public class Tag {
     public Tag() {
     }
 
+    public Tag(String name, DiaryEntry entry) {
+        this.name = name;
+        this.entry = entry;
+    }
+
     public Tag(Integer id, String name, DiaryEntry entry) {
         this.id = id;
         this.name = name;
@@ -74,7 +79,6 @@ public class Tag {
         return "Tag{" +
                 "id=" + id +
                 ", name=" + name +
-                ", entry=" + entry +
                 '}';
     }
 }
