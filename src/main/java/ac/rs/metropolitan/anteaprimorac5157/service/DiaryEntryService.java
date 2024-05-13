@@ -20,10 +20,6 @@ public class DiaryEntryService {
         return diaryEntryRepository.findAll();
     }
 
-    public Long count() {
-        return diaryEntryRepository.count();
-    }
-
     public Optional<DiaryEntry> get(Integer id) {
         return diaryEntryRepository.findById(id);
     }

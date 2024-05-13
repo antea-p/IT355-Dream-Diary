@@ -49,15 +49,58 @@ public class DiaryController {
     public String saveDiaryEntry(@RequestParam Map<String,String> parameters,
                                  @AuthenticationPrincipal DiaryUserDetails currentUser) {
         DiaryEntry diaryEntry = createDiaryEntryObject(parameters, currentUser);
-
+        diaryEntry.setCreatedDate(LocalDate.now());
         diaryEntryService.save(diaryEntry);
 
         return "redirect:/diary";
     }
 
-    private DiaryEntry createDiaryEntryObject(Map<String, String> parameters, DiaryUserDetails currentUser) {
-        System.out.println(parameters); // TODO: remove
+@GetMapping("/edit/{id}")
+public String showEditForm(@PathVariable("id") Integer id, Model model, @AuthenticationPrincipal DiaryUserDetails currentUser) {
+    DiaryEntry diaryEntry = diaryEntryService.get(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid diary Id:" + id));
+    if (currentUser.getId().equals(diaryEntry.getUserId())) {
+        List<Emotion> allEmotions = emotionService.findAllEmotions();
+        List<Integer> selectedEmotionIds = diaryEntry.getEmotions().stream()
+                .map(Emotion::getId)
+                .collect(Collectors.toList());
 
+        model.addAttribute("diaryEntry", diaryEntry);
+        model.addAttribute("allEmotions", allEmotions);
+        model.addAttribute("selectedEmotionIds", selectedEmotionIds);
+
+        String commaSeparatedTags = diaryEntry.getTags().stream()
+                .map(Tag::getName)
+                .collect(Collectors.joining(", "));
+        model.addAttribute("commaSeparatedTags", commaSeparatedTags);
+
+        return "edit";
+    }
+
+    return "login";
+}
+
+    @PostMapping("/edit")
+    public String updateDiaryEntry(@RequestParam Map<String, String> parameters,
+                                   @AuthenticationPrincipal DiaryUserDetails currentUser) {
+        System.out.println("PARAMETERS: " + parameters);
+        DiaryEntry oldDiaryEntry = diaryEntryService.get(Integer.valueOf(parameters.get("id"))).orElseThrow();
+        if (currentUser.getId().equals(oldDiaryEntry.getUserId())) {
+            DiaryEntry updatedDiaryEntry = createDiaryEntryObject(parameters, currentUser);
+            updatedDiaryEntry.setId(oldDiaryEntry.getId());
+            updatedDiaryEntry.setCreatedDate(oldDiaryEntry.getCreatedDate());
+
+            System.out.println("UPDATED DIARYENTRY:" + updatedDiaryEntry);
+
+            diaryEntryService.save(updatedDiaryEntry);
+
+            return "redirect:/diary";
+        }
+
+        return "redirect:/login";
+    }
+
+    private DiaryEntry createDiaryEntryObject(Map<String, String> parameters, DiaryUserDetails currentUser) {
         String title = parameters.get("title");
         String content = parameters.get("content");
         String tagsInput = parameters.get("tags");
@@ -69,7 +112,6 @@ public class DiaryController {
         DiaryEntry diaryEntry = new DiaryEntry()
                 .setTitle(title)
                 .setContent(content)
-                .setCreatedDate(LocalDate.now())
                 .setUserId(currentUser.getId())
                 .setEmotions(selectedEmotions)
                 .setTags(tags);
