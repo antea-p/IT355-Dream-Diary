@@ -16,22 +16,16 @@ public class Tag {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "entry_id", nullable = false)
-    private DiaryEntry entry;
-
     public Tag() {
     }
 
-    public Tag(String name, DiaryEntry entry) {
+    public Tag(String name) {
         this.name = name;
-        this.entry = entry;
     }
 
-    public Tag(Integer id, String name, DiaryEntry entry) {
+    public Tag(Integer id, String name) {
         this.id = id;
         this.name = name;
-        this.entry = entry;
     }
 
     public Integer getId() {
@@ -52,26 +46,17 @@ public class Tag {
         return this;
     }
 
-    public DiaryEntry getEntry() {
-        return entry;
-    }
-
-    public Tag setEntry(DiaryEntry entry) {
-        this.entry = entry;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tag tag = (Tag) o;
-        return Objects.equals(id, tag.id) && Objects.equals(name, tag.name) && Objects.equals(entry, tag.entry);
+        return Objects.equals(id, tag.id) && Objects.equals(name, tag.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, entry);
+        return Objects.hash(id, name);
     }
 
     @Override

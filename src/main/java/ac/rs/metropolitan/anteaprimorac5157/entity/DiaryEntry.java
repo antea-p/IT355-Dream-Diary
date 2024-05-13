@@ -27,7 +27,8 @@ public class DiaryEntry {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    @OneToMany(mappedBy = "entry", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "entry_id")
     private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany

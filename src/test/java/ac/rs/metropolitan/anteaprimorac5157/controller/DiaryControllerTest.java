@@ -3,6 +3,7 @@ package ac.rs.metropolitan.anteaprimorac5157.controller;
 import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryEntry;
 import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryUser;
 import ac.rs.metropolitan.anteaprimorac5157.entity.Emotion;
+import ac.rs.metropolitan.anteaprimorac5157.entity.Tag;
 import ac.rs.metropolitan.anteaprimorac5157.security.DiaryUserDetails;
 import ac.rs.metropolitan.anteaprimorac5157.service.DiaryEntryService;
 import ac.rs.metropolitan.anteaprimorac5157.service.EmotionService;
@@ -43,6 +44,12 @@ class DiaryControllerTest {
         when(mockEmotionService.findAllEmotions()).thenReturn(EMOTION_LIST);
     }
 
+    private void prepareTagsParameter(Map<String, String> parameters, String tags) {
+        if (tags != null) {
+            parameters.put("tags", tags);
+        }
+    }
+
     @Test
     void testShowCreateForm() {
         assertThat(diaryController.showCreateForm(mockModel)).isEqualTo("create");
@@ -52,13 +59,13 @@ class DiaryControllerTest {
 
     }
 
-    // TODO: update for tags
     @Test
     void testSaveDiaryEntryNoEmotions() {
         Map<String, String> PARAMETERS = new HashMap<>();
 
         PARAMETERS.put("title", TITLE);
         PARAMETERS.put("content", CONTENT);
+        PARAMETERS.put("tags", "");
 
         DiaryEntry expectedDiaryEntry = new DiaryEntry(TITLE, CONTENT, LocalDate.now(), USER_DETAILS.getId(),
                 List.of(), List.of());
@@ -70,14 +77,49 @@ class DiaryControllerTest {
 
     @Test
     void testSaveDiaryEntryOneEmotion() {
-        Map<String, String> parameters = new HashMap<>();
+        Map<String, String> PARAMETERS = new HashMap<>();
 
-        parameters.put("title", TITLE);
-        parameters.put("content", CONTENT);
-        parameters.put("emotion_1", "1");
+        PARAMETERS.put("title", TITLE);
+        PARAMETERS.put("content", CONTENT);
+        PARAMETERS.put("tags", "");
+        PARAMETERS.put("emotion_1", "1");
 
         DiaryEntry expectedDiaryEntry = new DiaryEntry(TITLE, CONTENT, LocalDate.now(), USER_DETAILS.getId(),
                 List.of(), List.of(new Emotion(1, "Nostalgia")));
+        when(mockDiaryEntryService.save(expectedDiaryEntry)).thenReturn(expectedDiaryEntry);
+
+        assertThat(diaryController.saveDiaryEntry(PARAMETERS, USER_DETAILS)).isEqualTo("redirect:/diary");
+        verify(mockDiaryEntryService, times(1)).save(expectedDiaryEntry);
+    }
+
+    @Test
+    void testSaveDiaryEntryAllEmotions() {
+        Map<String, String> PARAMETERS = new HashMap<>();
+
+        PARAMETERS.put("title", TITLE);
+        PARAMETERS.put("content", CONTENT);
+        PARAMETERS.put("tags", "");
+
+        for (Emotion emotion : EMOTION_LIST) {
+            PARAMETERS.put("emotion_ " + emotion.getId(), emotion.getId().toString());
+        }
+
+        DiaryEntry expectedDiaryEntry = new DiaryEntry(TITLE, CONTENT, LocalDate.now(), USER_DETAILS.getId(),
+                List.of(), EMOTION_LIST);
+        when(mockDiaryEntryService.save(expectedDiaryEntry)).thenReturn(expectedDiaryEntry);
+
+        assertThat(diaryController.saveDiaryEntry(PARAMETERS, USER_DETAILS)).isEqualTo("redirect:/diary");
+        verify(mockDiaryEntryService, times(1)).save(expectedDiaryEntry);
+    }
+
+    @Test
+    void testSaveDiaryEntryNoTags() {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("title", TITLE);
+        parameters.put("content", CONTENT);
+        prepareTagsParameter(parameters, "");
+
+        DiaryEntry expectedDiaryEntry = new DiaryEntry(TITLE, CONTENT, LocalDate.now(), USER_DETAILS.getId(), List.of(), List.of());
         when(mockDiaryEntryService.save(expectedDiaryEntry)).thenReturn(expectedDiaryEntry);
 
         assertThat(diaryController.saveDiaryEntry(parameters, USER_DETAILS)).isEqualTo("redirect:/diary");
@@ -85,21 +127,33 @@ class DiaryControllerTest {
     }
 
     @Test
-    void testSaveDiaryEntryAllEmotions() {
+    void testSaveDiaryEntryOneTag() {
         Map<String, String> parameters = new HashMap<>();
-
         parameters.put("title", TITLE);
         parameters.put("content", CONTENT);
-
-        for (Emotion emotion : EMOTION_LIST) {
-            parameters.put("emotion_ " + emotion.getId(), emotion.getId().toString());
-        }
+        prepareTagsParameter(parameters, "Library");
 
         DiaryEntry expectedDiaryEntry = new DiaryEntry(TITLE, CONTENT, LocalDate.now(), USER_DETAILS.getId(),
-                List.of(), EMOTION_LIST);
+                List.of(new Tag("Library")), List.of());
         when(mockDiaryEntryService.save(expectedDiaryEntry)).thenReturn(expectedDiaryEntry);
 
         assertThat(diaryController.saveDiaryEntry(parameters, USER_DETAILS)).isEqualTo("redirect:/diary");
         verify(mockDiaryEntryService, times(1)).save(expectedDiaryEntry);
     }
+
+    @Test
+    void testSaveDiaryEntryMultipleTags() {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("title", TITLE);
+        parameters.put("content", CONTENT);
+        prepareTagsParameter(parameters, "Library, Magic, Childhood");
+
+        DiaryEntry expectedDiaryEntry = new DiaryEntry(TITLE, CONTENT, LocalDate.now(), USER_DETAILS.getId(),
+                List.of(new Tag("Library"), new Tag("Magic"), new Tag("Childhood")), List.of());
+        when(mockDiaryEntryService.save(expectedDiaryEntry)).thenReturn(expectedDiaryEntry);
+
+        assertThat(diaryController.saveDiaryEntry(parameters, USER_DETAILS)).isEqualTo("redirect:/diary");
+        verify(mockDiaryEntryService, times(1)).save(expectedDiaryEntry);
+    }
+
 }

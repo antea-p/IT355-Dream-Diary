@@ -45,21 +45,24 @@ public class DiaryController {
         return "create";
     }
 
-    // TODO: refactoring
     @PostMapping("/create")
     public String saveDiaryEntry(@RequestParam Map<String,String> parameters,
                                  @AuthenticationPrincipal DiaryUserDetails currentUser) {
-        System.out.println(parameters);
+        DiaryEntry diaryEntry = createDiaryEntryObject(parameters, currentUser);
+
+        diaryEntryService.save(diaryEntry);
+
+        return "redirect:/diary";
+    }
+
+    private DiaryEntry createDiaryEntryObject(Map<String, String> parameters, DiaryUserDetails currentUser) {
+        System.out.println(parameters); // TODO: remove
 
         String title = parameters.get("title");
         String content = parameters.get("content");
         String tagsInput = parameters.get("tags");
 
-        List<Tag> tags = Arrays.stream(tagsInput.split(","))
-                .map(String::trim) // Briše suvišne razmake (blanko)
-                .filter(tag -> !tag.isEmpty())
-                .map(tag -> new Tag(tag, null))  // Privremeni null jer još nije kreiran DiaryEntry objekat
-                .collect(Collectors.toList());
+        List<Tag> tags = extractTags(tagsInput);
 
         List<Emotion> selectedEmotions = extractSelectedEmotions(parameters);
 
@@ -70,11 +73,15 @@ public class DiaryController {
                 .setUserId(currentUser.getId())
                 .setEmotions(selectedEmotions)
                 .setTags(tags);
+        return diaryEntry;
+    }
 
-        tags.forEach(tag -> tag.setEntry(diaryEntry));  // Sada se podešava korektni DiaryEntry objekat
-        diaryEntryService.save(diaryEntry);
-
-        return "redirect:/diary";
+    private static List<Tag> extractTags(String tagsInput) {
+        return Arrays.stream(tagsInput.split(","))
+                .map(String::trim) // Briše suvišne razmake (blanko)
+                .filter(tag -> !tag.isEmpty())
+                .map(Tag::new)
+                .collect(Collectors.toList());
     }
 
     private List<Emotion> extractSelectedEmotions(Map<String, String> parameters) {

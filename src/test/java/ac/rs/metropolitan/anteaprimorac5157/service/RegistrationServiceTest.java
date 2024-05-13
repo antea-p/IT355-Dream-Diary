@@ -22,7 +22,6 @@ class RegistrationServiceTest {
     private RegistrationService registrationService;
     private DiaryUserRepository mockRepository;
     private PasswordEncoder mockPasswordEncoder;
-    private DiaryUserDetails userDetails;
     private RegistrationCommand command;
 
     @BeforeEach
@@ -55,7 +54,6 @@ class RegistrationServiceTest {
         command = new RegistrationCommand("sonic", "sonic-adventures-1998", "1-sonic-adventures-1998");
         when(mockPasswordEncoder.encode("sonic-adventures-1998")).thenReturn("some-cool-hash");
 
-        DiaryUser newUser = new DiaryUser(null, "sonic", "some-cool-hash", false);
         when(mockRepository.findByUsername("sonic"))
                 .thenReturn(Optional.empty());
 
