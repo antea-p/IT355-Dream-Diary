@@ -6,6 +6,7 @@ import ac.rs.metropolitan.anteaprimorac5157.entity.Tag;
 import ac.rs.metropolitan.anteaprimorac5157.security.DiaryUserDetails;
 import ac.rs.metropolitan.anteaprimorac5157.service.DiaryEntryService;
 import ac.rs.metropolitan.anteaprimorac5157.service.EmotionService;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// TODO: make it so that changing title or content doesn't affect listing order
 @Controller
 @RequestMapping("/diary")
 public class DiaryController {
@@ -40,64 +42,84 @@ public class DiaryController {
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("diaryEntry", new DiaryEntry());
-        model.addAttribute("emotions", emotionService.findAllEmotions());
-        return "create";
+        return populateCreateForm(model, new DiaryEntry());
     }
 
     @PostMapping("/create")
     public String saveDiaryEntry(@RequestParam Map<String,String> parameters,
-                                 @AuthenticationPrincipal DiaryUserDetails currentUser) {
+                                 @AuthenticationPrincipal DiaryUserDetails currentUser,
+                                 Model model) {
         DiaryEntry diaryEntry = createDiaryEntryObject(parameters, currentUser);
         diaryEntry.setCreatedDate(LocalDate.now());
+
+        if (!validateDiaryEntry(diaryEntry, model)) {
+            return populateCreateForm(model, diaryEntry);
+        }
+
         diaryEntryService.save(diaryEntry);
 
         return "redirect:/diary";
     }
 
-@GetMapping("/edit/{id}")
-public String showEditForm(@PathVariable("id") Integer id, Model model, @AuthenticationPrincipal DiaryUserDetails currentUser) {
-    DiaryEntry diaryEntry = diaryEntryService.get(id)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid diary Id:" + id));
-    if (currentUser.getId().equals(diaryEntry.getUserId())) {
+    private String populateCreateForm(Model model, DiaryEntry diaryEntry) {
+        model.addAttribute("diaryEntry", diaryEntry);
+        model.addAttribute("emotions", emotionService.findAllEmotions());
+        return "create";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable("id") Integer id, Model model, @AuthenticationPrincipal DiaryUserDetails currentUser) {
+        DiaryEntry diaryEntry = diaryEntryService.get(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid diary Id:" + id));
+        if (!currentUser.getId().equals(diaryEntry.getUserId())) {
+            return "login";
+        }
+
+        return populateEditForm(model, diaryEntry);
+    }
+
+    @PostMapping("/edit")
+    public String updateDiaryEntry(@RequestParam Map<String, String> parameters,
+                                   @AuthenticationPrincipal DiaryUserDetails currentUser,
+                                   Model model) {
+        DiaryEntry oldDiaryEntry = diaryEntryService.get(Integer.valueOf(parameters.get("id"))).orElseThrow();
+        if (!currentUser.getId().equals(oldDiaryEntry.getUserId())) {
+            return "redirect:/login";
+        }
+
+        DiaryEntry updatedDiaryEntry = createDiaryEntryObject(parameters, currentUser);
+        updatedDiaryEntry.setId(oldDiaryEntry.getId());
+        updatedDiaryEntry.setCreatedDate(oldDiaryEntry.getCreatedDate());
+
+        if (!validateDiaryEntry(updatedDiaryEntry, model)) {
+            return populateEditForm(model, updatedDiaryEntry);
+        }
+
+        System.out.println("UPDATED DIARYENTRY:" + updatedDiaryEntry);
+
+        diaryEntryService.save(updatedDiaryEntry);
+
+        return "redirect:/diary";
+
+    }
+
+    @NotNull
+    private String populateEditForm(Model model, DiaryEntry updatedDiaryEntry) {
         List<Emotion> allEmotions = emotionService.findAllEmotions();
-        List<Integer> selectedEmotionIds = diaryEntry.getEmotions().stream()
+        List<Integer> selectedEmotionIds = updatedDiaryEntry.getEmotions().stream()
                 .map(Emotion::getId)
                 .collect(Collectors.toList());
 
-        model.addAttribute("diaryEntry", diaryEntry);
+        model.addAttribute("diaryEntry", updatedDiaryEntry);
         model.addAttribute("allEmotions", allEmotions);
         model.addAttribute("selectedEmotionIds", selectedEmotionIds);
 
-        String commaSeparatedTags = diaryEntry.getTags().stream()
+        String commaSeparatedTags = updatedDiaryEntry.getTags().stream()
                 .map(Tag::getName)
                 .collect(Collectors.joining(", "));
         model.addAttribute("commaSeparatedTags", commaSeparatedTags);
 
         return "edit";
-    }
-
-    return "login";
-}
-
-    @PostMapping("/edit")
-    public String updateDiaryEntry(@RequestParam Map<String, String> parameters,
-                                   @AuthenticationPrincipal DiaryUserDetails currentUser) {
-        System.out.println("PARAMETERS: " + parameters);
-        DiaryEntry oldDiaryEntry = diaryEntryService.get(Integer.valueOf(parameters.get("id"))).orElseThrow();
-        if (currentUser.getId().equals(oldDiaryEntry.getUserId())) {
-            DiaryEntry updatedDiaryEntry = createDiaryEntryObject(parameters, currentUser);
-            updatedDiaryEntry.setId(oldDiaryEntry.getId());
-            updatedDiaryEntry.setCreatedDate(oldDiaryEntry.getCreatedDate());
-
-            System.out.println("UPDATED DIARYENTRY:" + updatedDiaryEntry);
-
-            diaryEntryService.save(updatedDiaryEntry);
-
-            return "redirect:/diary";
-        }
-
-        return "redirect:/login";
     }
 
     private DiaryEntry createDiaryEntryObject(Map<String, String> parameters, DiaryUserDetails currentUser) {
@@ -116,6 +138,22 @@ public String showEditForm(@PathVariable("id") Integer id, Model model, @Authent
                 .setEmotions(selectedEmotions)
                 .setTags(tags);
         return diaryEntry;
+    }
+
+    private boolean validateDiaryEntry(DiaryEntry diaryEntry, Model model) {
+        if (diaryEntry.getTitle().isEmpty()) {
+            model.addAttribute("titleError", "Title is required");
+            return false;
+        }
+        if (diaryEntry.getTitle().length() > 100) {
+            model.addAttribute("titleError", "Title is too long (max 100 characters)");
+            return false;
+        }
+        if (diaryEntry.getContent().isEmpty()) {
+            model.addAttribute("contentError", "Content is required");
+            return false;
+        }
+        return true;
     }
 
     private static List<Tag> extractTags(String tagsInput) {
@@ -140,8 +178,6 @@ public String showEditForm(@PathVariable("id") Integer id, Model model, @Authent
                 .toList();
         return selectedEmotions;
     }
-
-    // TODO: edit mapiranje
 
     @GetMapping("/delete/{id}")
     public String deleteDiaryEntry(@PathVariable Integer id) {
