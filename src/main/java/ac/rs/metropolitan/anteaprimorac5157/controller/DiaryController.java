@@ -35,8 +35,18 @@ public class DiaryController {
 
     // TODO: search & sort
     @GetMapping
-    public String showDiaryList(Model model) {
-        model.addAttribute("diaryEntries", diaryEntryService.list());
+    public String showDiaryList(@RequestParam(value = "sortBy", required = false) String sortBy,
+                                @RequestParam(value = "clearSort", required = false) String clearSort,
+                                Model model) {
+        List<DiaryEntry> diaryEntries;
+        if (clearSort != null) {
+            diaryEntries = diaryEntryService.list();
+        } else if ("title".equals(sortBy)) {
+            diaryEntries = diaryEntryService.listSortedByTitle();
+        } else {
+            diaryEntries = diaryEntryService.list();
+        }
+        model.addAttribute("diaryEntries", diaryEntries);
         return "list";
     }
 

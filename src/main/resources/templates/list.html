@@ -15,13 +15,18 @@
             Are you ready?
         </p>
 
-        <!-- TODO: search, sort -->
+        <form action="/diary" method="get">
+            <button type="submit" name="sortBy" value="title">Sort by Title</button>
+        </form>
+
+        <form action="/diary" method="get">
+            <button type="submit" name="clearSort" value="true">Clear Sorting</button>
+        </form>
 
         <ul>
             <li th:each="entry : ${diaryEntries}">
                 <h2>
-                    <a th:href="@{/diary/show/{id}(id=${entry.id})}"
-                       th:text="${entry.title}">[Title]</a>
+                    <a th:href="@{/diary/show/{id}(id=${entry.id})}" th:text="${entry.title}">[Title]</a>
                 </h2>
                 <p th:text="${#strings.abbreviate(entry.content, 32)} + '...'">[Content]</p>
                 <p th:text="${entry.createdDate}">[Date]</p>
@@ -36,7 +41,6 @@
                     <!-- TODO: comma separation-->
                     <span th:each="emotion : ${entry.emotions}" th:text="${emotion.name}">[Emotion Name]</span>
                 </div>
-
             </li>
         </ul>
 

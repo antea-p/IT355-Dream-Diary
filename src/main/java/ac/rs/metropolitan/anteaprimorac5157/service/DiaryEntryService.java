@@ -20,6 +20,10 @@ public class DiaryEntryService {
         return diaryEntryRepository.findAll();
     }
 
+    public List<DiaryEntry> listSortedByTitle() {
+        return diaryEntryRepository.findAllByOrderByTitleAsc();
+    }
+
     public Optional<DiaryEntry> get(Integer id) {
         return diaryEntryRepository.findById(id);
     }

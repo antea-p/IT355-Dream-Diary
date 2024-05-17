@@ -33,12 +33,25 @@ class DiaryEntryServiceTest {
 
 
     @Test
-    void testGetAllDiaryEntries() {
+    void testListAllDiaryEntries() {
         List<DiaryEntry> expectedResult = List.of(DIARY_ENTRY, DIARY_ENTRY_2);
         when(mockRepository.findAll()).thenReturn(expectedResult);
 
         List<DiaryEntry> actualResult = diaryEntryService.list();
         assertThat(actualResult).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testListAllDiaryEntries_SortedByTitle_Ascending() {
+        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), 1, List.of(), List.of(new Emotion(1, "Nostalgia")));
+        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), 2, List.of(), List.of(new Emotion(2, "Wonder")));
+        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), 3, List.of(), List.of(new Emotion(3, "Joy")));
+
+        List<DiaryEntry> sortedEntries = List.of(entry1, entry2, entry3);
+        when(mockRepository.findAllByOrderByTitleAsc()).thenReturn(sortedEntries);
+
+        List<DiaryEntry> actualResult = diaryEntryService.listSortedByTitle();
+        assertThat(actualResult).isEqualTo(sortedEntries);
     }
 
     @Test
