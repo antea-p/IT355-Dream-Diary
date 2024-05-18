@@ -18,10 +18,12 @@ public class DiaryEntryService {
         this.diaryEntryRepository = diaryEntryRepository;
     }
 
-    public List<DiaryEntry> list(@Nullable Sort.Direction direction, @Nullable DiaryEntrySortingCriteria sortBy) {
+    public List<DiaryEntry> list(@Nullable Sort.Direction direction, @Nullable DiaryEntrySortingCriteria sortBy,
+                                 @Nullable String title) {
         Sort sort = Sort.by(direction == null ? Sort.Direction.ASC : direction,
                 sortBy == null ? "id" : sortBy.toString());
-        return diaryEntryRepository.findAll(sort);
+        return (title == null)? diaryEntryRepository.findAll(sort) :
+                diaryEntryRepository.findByTitleContainingIgnoreCase(title, sort);
     }
 
     public Optional<DiaryEntry> get(Integer id) {

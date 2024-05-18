@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Integer> {
     List<DiaryEntry> findAll(Sort sort);
-
+    List<DiaryEntry> findByTitleContainingIgnoreCase(String title, Sort sort);
 }

@@ -40,14 +40,15 @@ public class DiaryController {
     public String showDiaryList(@RequestParam(value = "sortBy", required = false) String sortBy,
                                 @RequestParam(value = "sortDir", required = false) String sortDir,
                                 @RequestParam(value = "clearSort", required = false) String clearSort,
+                                @RequestParam(value = "title", required = false) String title,
                                 Model model) {
         List<DiaryEntry> diaryEntries;
         if (clearSort != null) {
-            diaryEntries = diaryEntryService.list(null, null);
+            diaryEntries = diaryEntryService.list(null, null, title);
         } else {
             DiaryEntrySortingCriteria criteria = sortBy == null ? null : DiaryEntrySortingCriteria.valueOf(sortBy.toUpperCase());
             Sort.Direction direction = sortDir == null ? Sort.Direction.ASC : Sort.Direction.valueOf(sortDir.toUpperCase());
-            diaryEntries = diaryEntryService.list(direction, criteria);
+            diaryEntries = diaryEntryService.list(direction, criteria, title);
         }
         model.addAttribute("diaryEntries", diaryEntries);
         return "list";
