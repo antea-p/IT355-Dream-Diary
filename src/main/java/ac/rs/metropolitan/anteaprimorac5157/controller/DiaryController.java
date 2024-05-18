@@ -5,9 +5,11 @@ import ac.rs.metropolitan.anteaprimorac5157.entity.Emotion;
 import ac.rs.metropolitan.anteaprimorac5157.entity.Tag;
 import ac.rs.metropolitan.anteaprimorac5157.security.DiaryUserDetails;
 import ac.rs.metropolitan.anteaprimorac5157.service.DiaryEntryService;
+import ac.rs.metropolitan.anteaprimorac5157.service.DiaryEntrySortingCriteria;
 import ac.rs.metropolitan.anteaprimorac5157.service.EmotionService;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,15 +38,16 @@ public class DiaryController {
     // TODO: search & sort
     @GetMapping
     public String showDiaryList(@RequestParam(value = "sortBy", required = false) String sortBy,
+                                @RequestParam(value = "sortDir", required = false) String sortDir,
                                 @RequestParam(value = "clearSort", required = false) String clearSort,
                                 Model model) {
         List<DiaryEntry> diaryEntries;
         if (clearSort != null) {
-            diaryEntries = diaryEntryService.list();
-        } else if ("title".equals(sortBy)) {
-            diaryEntries = diaryEntryService.listSortedByTitle();
+            diaryEntries = diaryEntryService.list(null, null);
         } else {
-            diaryEntries = diaryEntryService.list();
+            DiaryEntrySortingCriteria criteria = sortBy == null ? null : DiaryEntrySortingCriteria.valueOf(sortBy.toUpperCase());
+            Sort.Direction direction = sortDir == null ? Sort.Direction.ASC : Sort.Direction.valueOf(sortDir.toUpperCase());
+            diaryEntries = diaryEntryService.list(direction, criteria);
         }
         model.addAttribute("diaryEntries", diaryEntries);
         return "list";

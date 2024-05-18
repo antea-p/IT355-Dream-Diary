@@ -16,7 +16,12 @@
         </p>
 
         <form action="/diary" method="get">
-            <button type="submit" name="sortBy" value="title">Sort by Title</button>
+            <button type="submit" name="sortBy" value="TITLE">Sort by Title</button>
+            <button type="submit" name="sortBy" value="CREATEDDATE">Sort by Date</button>
+            <select name="sortDir">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
         </form>
 
         <form action="/diary" method="get">
