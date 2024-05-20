@@ -6,6 +6,7 @@ import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryUserRepository;
 import ac.rs.metropolitan.anteaprimorac5157.service.RegistrationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -28,12 +30,18 @@ public class RegistrationController {
     }
 
     @GetMapping()
-    public String showRegister() {
+    public String showRegister(Model model) {
+        model.addAttribute("registrationCommand", new RegistrationCommand());
         return "register";
     }
 
-    @PostMapping()
-    public String register(Model model, @ModelAttribute RegistrationCommand registrationCommand, HttpServletRequest request) {
+   @PostMapping()
+    public String register(Model model, @Valid @ModelAttribute RegistrationCommand registrationCommand,
+                           BindingResult bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return "register";
+        }
+
         try {
             UserDetails registeredUserDetails = registrationService.register(registrationCommand);
             // Dohvaća novog korisnika i stavlja ga u tekuću sesiju (da bi se tretirao kao logiran korisnik)

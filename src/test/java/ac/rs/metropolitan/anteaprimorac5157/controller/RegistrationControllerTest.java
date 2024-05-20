@@ -10,6 +10,10 @@ import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -22,6 +26,7 @@ class RegistrationControllerTest {
     private Model mockModel;
     private HttpServletRequest mockRequest;
     private HttpSession mockSession;
+    private BindingResult mockBindingResult;
 
     @BeforeEach
     void setUp() {
@@ -30,6 +35,13 @@ class RegistrationControllerTest {
         this.mockModel = mock(Model.class);
         this.mockRequest = mock(HttpServletRequest.class);
         this.mockSession = mock(HttpSession.class);
+        this.mockBindingResult = mock(BindingResult.class);
+    }
+
+    @Test
+    void testShowRegistationForm() {
+        assertThat(registrationController.showRegister(mockModel)).isEqualTo("register");
+        verify(mockModel).addAttribute("registrationCommand", new RegistrationCommand());
     }
 
     @Test
@@ -39,7 +51,7 @@ class RegistrationControllerTest {
         when(mockService.register(registrationCommand)).thenReturn(expectedUserDetails);
         when(mockRequest.getSession(true)).thenReturn(mockSession);
 
-        assertThat(registrationController.register(mockModel, registrationCommand, mockRequest)).isEqualTo("redirect:/");
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("redirect:/");
         verify(mockSession).setAttribute(eq("SPRING_SECURITY_CONTEXT"), any());
     }
 
@@ -48,7 +60,7 @@ class RegistrationControllerTest {
         registrationCommand = new RegistrationCommand("sonic", "sonic-adventures-1998", "sonic-adventures-1998-whoops");
         when(mockService.register(registrationCommand)).thenThrow(new RegistrationFailedException("Passwords don't match!"));
 
-        assertThat(registrationController.register(mockModel, registrationCommand, mockRequest)).isEqualTo("register");
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("register");
         verify(mockModel).addAttribute("error", "Passwords don't match!");
     }
 
@@ -57,7 +69,53 @@ class RegistrationControllerTest {
         registrationCommand = new RegistrationCommand("omori", "password", "password");
         when(mockService.register(registrationCommand)).thenThrow(new RegistrationFailedException("User already exists!"));
 
-        assertThat(registrationController.register(mockModel, registrationCommand, mockRequest)).isEqualTo("register");
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("register");
         verify(mockModel).addAttribute("error", "User already exists!");
+    }
+
+    @Test
+    void testRegistrationFailsIfUsernameIsBlank() {
+        registrationCommand = new RegistrationCommand("", "password", "password");
+        when(mockBindingResult.hasErrors()).thenReturn(true);
+        when(mockBindingResult.getAllErrors()).thenReturn(List.of(new ObjectError("username", "Username can't be blank!")));
+
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("register");
+    }
+
+    @Test
+    void testRegistrationFailsIfPasswordIsBlank() {
+        registrationCommand = new RegistrationCommand("username", "", "");
+        when(mockBindingResult.hasErrors()).thenReturn(true);
+        when(mockBindingResult.getAllErrors()).thenReturn(List.of(new ObjectError("password", "Password can't be blank!")));
+
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("register");
+    }
+
+
+    @Test
+    void testRegistrationFailsIfUsernameTooShort() {
+        registrationCommand = new RegistrationCommand("ab", "password1", "password1");
+        when(mockBindingResult.hasErrors()).thenReturn(true);
+        when(mockBindingResult.getAllErrors()).thenReturn(List.of(new ObjectError("username", "Username must be at least 3 characters long!")));
+
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("register");
+    }
+
+    @Test
+    void testRegistrationFailsIfPasswordTooShort() {
+        registrationCommand = new RegistrationCommand("username", "pass", "pass");
+        when(mockBindingResult.hasErrors()).thenReturn(true);
+        when(mockBindingResult.getAllErrors()).thenReturn(List.of(new ObjectError("password", "Password must be at least 8 characters long!")));
+
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("register");
+    }
+
+    @Test
+    void testRegistrationFailsIfUsernameNotAlphanumeric() {
+        registrationCommand = new RegistrationCommand("user!name", "password1", "password1");
+        when(mockBindingResult.hasErrors()).thenReturn(true);
+        when(mockBindingResult.getAllErrors()).thenReturn(List.of(new ObjectError("username", "Username must contain only alphanumeric characters!")));
+
+        assertThat(registrationController.register(mockModel, registrationCommand, mockBindingResult, mockRequest)).isEqualTo("register");
     }
 }

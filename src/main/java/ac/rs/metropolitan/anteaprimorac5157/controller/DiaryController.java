@@ -35,7 +35,6 @@ public class DiaryController {
         this.emotionService = emotionService;
     }
 
-    // TODO: search & sort
     @GetMapping
     public String showDiaryList(@RequestParam(value = "sortBy", required = false) String sortBy,
                                 @RequestParam(value = "sortDir", required = false) String sortDir,
