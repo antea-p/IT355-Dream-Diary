@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <title>~ 𝓓𝓻𝓮𝓪𝓶 𝓓𝓲𝓪𝓻𝔂 ~</title>
     <link th:fragment="css" rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
 
-<!--TODO: maybe remove Login later on ; or better yet, hide it for logged in users (th:sec) -->
 <header th:fragment="header" class="flex">
-        <p class="header-top"><b>/home/</b></p>
-        <a class="header-cell" href="/">Home</a>
-        <a class="header-cell" href="/login">Login</a>
-        <a class="header-cell" href="/register">Register</a>
-        <a class="header-cell" href="/diary">My Diary</a>
-        <a class="header-cell" href="/about">About</a>
+    <p class="header-top"><b>/home/</b></p>
+    <a class="header-cell" href="/">Home</a>
+    <a class="header-cell" href="/login" sec:authorize="!isAuthenticated()">Login</a>
+    <a class="header-cell" href="/register" sec:authorize="!isAuthenticated()">Register</a>
+    <a class="header-cell" href="/diary" sec:authorize="isAuthenticated()">My Diary</a>
+    <a class="header-cell" href="/about">About</a>
 </header>
 
 <div th:fragment="footer">
