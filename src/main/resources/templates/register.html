@@ -20,12 +20,14 @@
             <div th:if="${#fields.hasErrors('username')}" class="alert alert-error">
                 <p th:errors="*{username}">Username Error</p>
             </div>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" th:field="*{username}" class="input-text"/>
 
             <div th:if="${#fields.hasErrors('password')}" class="alert alert-error">
                 <p th:errors="*{password}">Password Error</p>
             </div>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" th:field="*{username}" class="input-text"/>
+
             <label for="password">Password</label>
             <input type="password" id="password" name="password" th:field="*{password}" class="input-text"/>
 

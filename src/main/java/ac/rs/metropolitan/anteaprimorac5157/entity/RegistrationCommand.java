@@ -16,7 +16,6 @@ public class RegistrationCommand {
     @Size(min = 8, message = "Password must be at least 8 characters long!")
     private String password;
 
-    @NotBlank(message = "Repeat Password cannot be blank!")
     private String repeatPassword;
 
     public RegistrationCommand() {
