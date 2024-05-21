@@ -31,6 +31,10 @@ public class RegistrationController {
 
     @GetMapping()
     public String showRegister(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            return "redirect:/";
+        }
         model.addAttribute("registrationCommand", new RegistrationCommand());
         return "register";
     }

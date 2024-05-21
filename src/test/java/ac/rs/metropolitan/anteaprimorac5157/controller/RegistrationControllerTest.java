@@ -7,12 +7,20 @@ import ac.rs.metropolitan.anteaprimorac5157.security.DiaryUserDetails;
 import ac.rs.metropolitan.anteaprimorac5157.service.RegistrationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,6 +32,8 @@ class RegistrationControllerTest {
     private RegistrationService mockService;
     private RegistrationCommand registrationCommand;
     private Model mockModel;
+    private Authentication mockAuthentication;
+    private SecurityContext mockSecurityContext;
     private HttpServletRequest mockRequest;
     private HttpSession mockSession;
     private BindingResult mockBindingResult;
@@ -33,16 +43,44 @@ class RegistrationControllerTest {
         this.mockService = mock(RegistrationService.class);
         this.registrationController = new RegistrationController(mockService);
         this.mockModel = mock(Model.class);
+        this.mockAuthentication = mock(Authentication.class);
+        this.mockSecurityContext = mock(SecurityContext.class);
         this.mockRequest = mock(HttpServletRequest.class);
         this.mockSession = mock(HttpSession.class);
         this.mockBindingResult = mock(BindingResult.class);
+        SecurityContextHolder.clearContext();
     }
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+
+    // TODO: verify later, and add more tests if needed
     @Test
     void testShowRegistationForm() {
+        when(mockSecurityContext.getAuthentication()).thenReturn(null);
+        SecurityContextHolder.setContext(mockSecurityContext);
+
         assertThat(registrationController.showRegister(mockModel)).isEqualTo("register");
         verify(mockModel).addAttribute("registrationCommand", new RegistrationCommand());
     }
+
+    @Test
+    void testRedirectIfAuthenticated() {
+        when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+        SecurityContextHolder.setContext(mockSecurityContext);
+
+        when(mockAuthentication.isAuthenticated()).thenReturn(true);
+        when(mockAuthentication.getPrincipal()).thenReturn(
+                new DiaryUser("omori", "password", false)
+        );
+
+        assertThat(registrationController.showRegister(mockModel)).isEqualTo("redirect:/");
+    }
+
+
 
     @Test
     void testRegistrationSuccess() throws RegistrationFailedException {
