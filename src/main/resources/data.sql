@@ -29,7 +29,12 @@ VALUES
 ('Lost in a Forest of Whispering Shadows',
  'Every step is muffled by the eerie whispers of the trees, drowning in my thoughts.', 1, '2024-05-04'),
 ('Class Trial Revelation', 'As the truth unveils, the weight of every decision bears down on me.', 2, '2024-05-05'),
-('The Space Between Dreams', 'Floating in an endless void where thoughts and reality blur.', 1, '2024-05-06');
+('The Space Between Dreams', 'Floating in an endless void where thoughts and reality blur.', 1, '2024-05-06'),
+('Puzzle of Infinite Doors', 'Each door I open leads to another puzzle, and the clock is ticking...', 2, '2024-05-07'),
+('Silent School Hallways', 'The emptiness of the school at night makes every sound echo infinitely...', 2, '2024-05-08'),
+('Finding a Hidden Room', 'Behind the bookshelf, there was a hidden door to a room filled with secrets...', 2, '2024-05-09'),
+('Nightmare with No End', 'Running endlessly through dark corridors, the exit always just out of reach...', 2, '2024-05-10'),
+('Revelations in a Dream', 'In the dream, I discovered a truth that shattered my perception of reality...', 2, '2024-05-11');
 
 CREATE TABLE dream_diary.tags (
     tag_id SERIAL PRIMARY KEY,
