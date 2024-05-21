@@ -46,6 +46,11 @@ public class DiaryController {
         Sort.Direction direction = sortDir == null ? Sort.Direction.ASC : Sort.Direction.valueOf(sortDir.toUpperCase());
         diaryEntries = diaryEntryService.list(direction, criteria, title);
 
+        for (DiaryEntry entry : diaryEntries) {
+            List<Emotion> emotions = diaryEntryService.getEmotionsForDiaryEntry(entry.getId());
+            entry.setEmotions(emotions);
+        }
+
         model.addAttribute("diaryEntries", diaryEntries);
         return "list";
     }
@@ -66,7 +71,9 @@ public class DiaryController {
             return populateCreateForm(model, diaryEntry);
         }
 
-        diaryEntryService.save(diaryEntry);
+        DiaryEntry savedEntry = diaryEntryService.save(diaryEntry);
+        List<Emotion> selectedEmotions = extractSelectedEmotions(parameters);
+        diaryEntryService.updateDiaryEntryEmotions(savedEntry, selectedEmotions);
 
         return "redirect:/diary";
     }
@@ -108,6 +115,8 @@ public class DiaryController {
         System.out.println("UPDATED DIARYENTRY:" + updatedDiaryEntry);
 
         diaryEntryService.save(updatedDiaryEntry);
+        List<Emotion> selectedEmotions = extractSelectedEmotions(parameters);
+        diaryEntryService.updateDiaryEntryEmotions(updatedDiaryEntry, selectedEmotions);
 
         return "redirect:/diary";
 

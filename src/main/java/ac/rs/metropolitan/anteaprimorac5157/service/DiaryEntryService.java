@@ -1,7 +1,10 @@
 package ac.rs.metropolitan.anteaprimorac5157.service;
 
 import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryEntry;
+import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryEntryEmotion;
 import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryUser;
+import ac.rs.metropolitan.anteaprimorac5157.entity.Emotion;
+import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryEntryEmotionRepository;
 import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryEntryRepository;
 import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryUserRepository;
 import org.springframework.data.domain.Sort;
@@ -12,16 +15,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DiaryEntryService {
 
     private final DiaryEntryRepository diaryEntryRepository;
     private final DiaryUserRepository diaryUserRepository;
+    private final DiaryEntryEmotionRepository diaryEntryEmotionRepository;
 
-    public DiaryEntryService(DiaryEntryRepository diaryEntryRepository, DiaryUserRepository diaryUserRepository) {
+    public DiaryEntryService(DiaryEntryRepository diaryEntryRepository, DiaryUserRepository diaryUserRepository, DiaryEntryEmotionRepository diaryEntryEmotionRepository) {
         this.diaryEntryRepository = diaryEntryRepository;
         this.diaryUserRepository = diaryUserRepository;
+        this.diaryEntryEmotionRepository = diaryEntryEmotionRepository;
     }
 
     public List<DiaryEntry> list(@Nullable Sort.Direction direction, @Nullable DiaryEntrySortingCriteria sortBy,
@@ -42,6 +48,32 @@ public class DiaryEntryService {
 
     public void delete(Integer id) {
         diaryEntryRepository.deleteById(id);
+    }
+
+    public void updateDiaryEntryEmotions(DiaryEntry diaryEntry, List<Emotion> selectedEmotions) {
+        List<DiaryEntryEmotion> currentEmotions = diaryEntryEmotionRepository.findByEntryId(diaryEntry.getId());
+
+        for (DiaryEntryEmotion currentEmotion : currentEmotions) {
+            if (!selectedEmotions.contains(currentEmotion.getEmotion())) {
+                diaryEntryEmotionRepository.delete(currentEmotion);
+            }
+        }
+
+        for (Emotion selectedEmotion : selectedEmotions) {
+            if (currentEmotions.stream().noneMatch(e -> e.getEmotion().equals(selectedEmotion))) {
+                DiaryEntryEmotion newEntryEmotion = new DiaryEntryEmotion();
+                newEntryEmotion.setEntry(diaryEntry);
+                newEntryEmotion.setEmotion(selectedEmotion);
+                diaryEntryEmotionRepository.save(newEntryEmotion);
+            }
+        }
+    }
+
+    public List<Emotion> getEmotionsForDiaryEntry(Integer diaryEntryId) {
+        List<DiaryEntryEmotion> diaryEntryEmotions = diaryEntryEmotionRepository.findByEntryId(diaryEntryId);
+        return diaryEntryEmotions.stream()
+                .map(DiaryEntryEmotion::getEmotion)
+                .collect(Collectors.toList());
     }
 
     // TODO: improve performance

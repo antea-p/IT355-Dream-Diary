@@ -21,9 +21,20 @@
                 <th>User</th>
                 <th>Diary Count</th>
             </tr>
-            <tr th:each="stat : ${statistics}">
+            <tr th:each="stat : ${diaryEntriesStatistics}">
                 <td th:text="${stat.key}">User</td>
                 <td th:text="${stat.value}">Diary Count</td>
+            </tr>
+        </table>
+        <h2>Emotion Usage</h2>
+        <table>
+            <tr>
+                <th>Emotion</th>
+                <th>Count</th>
+            </tr>
+            <tr th:each="emotionStat : ${emotionStatistics}">
+                <td th:text="${emotionStat.key}">Emotion</td>
+                <td th:text="${emotionStat.value}">Count</td>
             </tr>
         </table>
     </div>

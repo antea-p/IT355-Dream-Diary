@@ -81,6 +81,8 @@ CREATE TABLE dream_diary.diary_entry_emotions (
 INSERT INTO dream_diary.diary_entry_emotions (entry_id, emotion_id)
 VALUES
 (1, 1),
+(1, 2),
+(1, 3),
 (2, 2),
 (3, 3),
 (4, 4),
