@@ -192,10 +192,9 @@ public class DiaryController {
                 .filter(key -> key.startsWith("emotion_"))
                 .map(key -> Integer.parseInt(parameters.get(key)))
                 .toList();
-        List<Emotion> selectedEmotions = allEmotions.stream()
+        return allEmotions.stream()
                 .filter(emotion -> selectedEmotionIds.contains(emotion.getId()))
-                .toList();
-        return selectedEmotions;
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/delete/{id}")

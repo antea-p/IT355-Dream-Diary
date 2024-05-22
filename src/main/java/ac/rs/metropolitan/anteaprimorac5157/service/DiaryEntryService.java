@@ -7,6 +7,7 @@ import ac.rs.metropolitan.anteaprimorac5157.entity.Emotion;
 import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryEntryEmotionRepository;
 import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryEntryRepository;
 import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryUserRepository;
+import ac.rs.metropolitan.anteaprimorac5157.repository.EmotionRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,14 @@ public class DiaryEntryService {
     private final DiaryEntryRepository diaryEntryRepository;
     private final DiaryUserRepository diaryUserRepository;
     private final DiaryEntryEmotionRepository diaryEntryEmotionRepository;
+    private final EmotionRepository emotionRepository;
 
-    public DiaryEntryService(DiaryEntryRepository diaryEntryRepository, DiaryUserRepository diaryUserRepository, DiaryEntryEmotionRepository diaryEntryEmotionRepository) {
+    public DiaryEntryService(DiaryEntryRepository diaryEntryRepository, DiaryUserRepository diaryUserRepository,
+                             DiaryEntryEmotionRepository diaryEntryEmotionRepository, EmotionRepository emotionRepository) {
         this.diaryEntryRepository = diaryEntryRepository;
         this.diaryUserRepository = diaryUserRepository;
         this.diaryEntryEmotionRepository = diaryEntryEmotionRepository;
+        this.emotionRepository = emotionRepository;
     }
 
     public List<DiaryEntry> list(@Nullable Sort.Direction direction, @Nullable DiaryEntrySortingCriteria sortBy,
@@ -39,7 +43,11 @@ public class DiaryEntryService {
     }
 
     public Optional<DiaryEntry> get(Integer id) {
-        return diaryEntryRepository.findById(id);
+        return diaryEntryRepository.findById(id).map(diaryEntry -> {
+            List<Emotion> emotions = getEmotionsForDiaryEntry(diaryEntry.getId());
+            diaryEntry.setEmotions(emotions);
+            return diaryEntry;
+        });
     }
 
     public DiaryEntry save(DiaryEntry diaryEntry) {
