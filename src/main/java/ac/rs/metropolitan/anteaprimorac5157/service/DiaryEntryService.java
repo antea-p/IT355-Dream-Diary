@@ -4,10 +4,7 @@ import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryEntry;
 import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryEntryEmotion;
 import ac.rs.metropolitan.anteaprimorac5157.entity.DiaryUser;
 import ac.rs.metropolitan.anteaprimorac5157.entity.Emotion;
-import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryEntryEmotionRepository;
-import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryEntryRepository;
-import ac.rs.metropolitan.anteaprimorac5157.repository.DiaryUserRepository;
-import ac.rs.metropolitan.anteaprimorac5157.repository.EmotionRepository;
+import ac.rs.metropolitan.anteaprimorac5157.repository.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -95,5 +92,9 @@ public class DiaryEntryService {
         }
 
         return diaryCountByUser;
+    }
+
+    public List<TagUsage> getTagUsageStatistics() {
+        return diaryEntryRepository.countTagUsage();
     }
 }

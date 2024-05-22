@@ -11,6 +11,7 @@
 <article class="content-box">
     <div>
         <h1>Admin Dashboard</h1>
+<!--        TODO: remove user list -->
         <h2>Users</h2>
         <ul>
             <li th:each="user : ${users}" th:text="${user}">User</li>
@@ -35,6 +36,17 @@
             <tr th:each="emotionStat : ${emotionStatistics}">
                 <td th:text="${emotionStat.key}">Emotion</td>
                 <td th:text="${emotionStat.value}">Count</td>
+            </tr>
+        </table>
+        <h2>Tag Usage</h2>
+        <table>
+            <tr>
+                <th>Tag</th>
+                <th>Count</th>
+            </tr>
+            <tr th:each="tagStat : ${tagUsageStatistics}">
+                <td th:text="${tagStat.name}">Tag</td>
+                <td th:text="${tagStat.count}">Count</td>
             </tr>
         </table>
     </div>

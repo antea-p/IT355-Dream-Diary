@@ -17,4 +17,7 @@ public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Integer>
 
     @Query("SELECT COUNT(diary_entry) FROM DiaryEntry diary_entry WHERE diary_entry.userId = :userId")
     int countByUserId(@Param("userId") Integer userId);
+
+    @Query("SELECT tag.name AS name, COUNT(tag.name) AS count FROM DiaryEntry diary_entry JOIN diary_entry.tags tag GROUP BY tag.name")
+    List<TagUsage> countTagUsage();
 }

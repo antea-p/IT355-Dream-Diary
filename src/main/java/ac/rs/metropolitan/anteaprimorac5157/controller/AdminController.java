@@ -23,11 +23,12 @@ public class AdminController {
 
     @GetMapping("/admin")
     public String showAdminPage(Model model) {
+        // TODO: remove users attr
         model.addAttribute("users", diaryUserDetailsService.getAllUsernames());
         model.addAttribute("diaryEntriesStatistics", diaryEntryService.getDiaryEntryCountByUser());
         model.addAttribute("emotionStatistics", emotionService.getEmotionUsageCount());
+        model.addAttribute("tagUsageStatistics", diaryEntryService.getTagUsageStatistics());
         return "admin";
     }
-
 
 }
