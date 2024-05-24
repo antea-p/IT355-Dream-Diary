@@ -8,9 +8,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Integer> {
+    // TODO: first two methods are probably redundant now
     List<DiaryEntry> findAll(Sort sort);
 
     List<DiaryEntry> findByTitleContainingIgnoreCase(String title, Sort sort);
@@ -20,4 +22,10 @@ public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Integer>
 
     @Query("SELECT tag.name AS name, COUNT(tag.name) AS count FROM DiaryEntry diary_entry JOIN diary_entry.tags tag GROUP BY tag.name")
     List<TagUsage> countTagUsage();
+
+    List<DiaryEntry> findByUserId(Integer userId, Sort sort);
+
+    List<DiaryEntry> findByUserIdAndTitleContainingIgnoreCase(Integer userId, String title, Sort sort);
+
+    Optional<DiaryEntry> findByIdAndUserId(Integer id, Integer userId);
 }

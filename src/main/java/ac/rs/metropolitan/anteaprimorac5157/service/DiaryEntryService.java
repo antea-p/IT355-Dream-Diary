@@ -31,16 +31,17 @@ public class DiaryEntryService {
         this.emotionRepository = emotionRepository;
     }
 
-    public List<DiaryEntry> list(@Nullable Sort.Direction direction, @Nullable DiaryEntrySortingCriteria sortBy,
+    public List<DiaryEntry> list(Integer userId, @Nullable Sort.Direction direction, @Nullable DiaryEntrySortingCriteria sortBy,
                                  @Nullable String title) {
         Sort sort = Sort.by(direction == null ? Sort.Direction.ASC : direction,
                 sortBy == null ? "id" : sortBy.toString());
-        return (title == null)? diaryEntryRepository.findAll(sort) :
-                diaryEntryRepository.findByTitleContainingIgnoreCase(title, sort);
+        return (title == null)?
+                diaryEntryRepository.findByUserId(userId, sort)
+                : diaryEntryRepository.findByUserIdAndTitleContainingIgnoreCase(userId, title, sort);
     }
 
-    public Optional<DiaryEntry> get(Integer id) {
-        return diaryEntryRepository.findById(id).map(diaryEntry -> {
+    public Optional<DiaryEntry> get(Integer id, Integer userId) {
+        return diaryEntryRepository.findByIdAndUserId(id, userId).map(diaryEntry -> {
             List<Emotion> emotions = getEmotionsForDiaryEntry(diaryEntry.getId());
             diaryEntry.setEmotions(emotions);
             return diaryEntry;
@@ -51,8 +52,9 @@ public class DiaryEntryService {
         return diaryEntryRepository.save(diaryEntry);
     }
 
-    public void delete(Integer id) {
-        diaryEntryRepository.deleteById(id);
+    public void delete(Integer id, Integer userId) {
+        Optional<DiaryEntry> entry = diaryEntryRepository.findByIdAndUserId(id, userId);
+        entry.ifPresent(diaryEntryRepository::delete);
     }
 
     public void updateDiaryEntryEmotions(DiaryEntry diaryEntry, List<Emotion> selectedEmotions) {
@@ -81,7 +83,7 @@ public class DiaryEntryService {
                 .collect(Collectors.toList());
     }
 
-    // TODO: improve performance
+    // TODO: improve performance for this and similar methods using JOIN fetch
     public Map<String, Integer> getDiaryEntryCountByUser() {
         List<DiaryUser> users = diaryUserRepository.findAll();
         Map<String, Integer> diaryCountByUser = new HashMap<>();

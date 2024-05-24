@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 // TODO: make it so that changing title or content doesn't affect listing order
@@ -39,12 +40,13 @@ public class DiaryController {
     public String showDiaryList(@RequestParam(value = "sortBy", required = false) String sortBy,
                                 @RequestParam(value = "sortDir", required = false) String sortDir,
                                 @RequestParam(value = "title", required = false) String title,
+                                @AuthenticationPrincipal DiaryUserDetails currentUser,
                                 Model model) {
         List<DiaryEntry> diaryEntries;
 
         DiaryEntrySortingCriteria criteria = sortBy == null ? null : DiaryEntrySortingCriteria.valueOf(sortBy.toUpperCase());
         Sort.Direction direction = sortDir == null ? Sort.Direction.ASC : Sort.Direction.valueOf(sortDir.toUpperCase());
-        diaryEntries = diaryEntryService.list(direction, criteria, title);
+        diaryEntries = diaryEntryService.list(currentUser.getId(), direction, criteria, title);
 
         for (DiaryEntry entry : diaryEntries) {
             List<Emotion> emotions = diaryEntryService.getEmotionsForDiaryEntry(entry.getId());
@@ -86,24 +88,27 @@ public class DiaryController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Integer id, Model model, @AuthenticationPrincipal DiaryUserDetails currentUser) {
-        DiaryEntry diaryEntry = diaryEntryService.get(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid diary Id:" + id));
-        if (!currentUser.getId().equals(diaryEntry.getUserId())) {
-            return "login";
+        Optional<DiaryEntry> diaryEntryOptional = diaryEntryService.get(id, currentUser.getId());
+
+        if (diaryEntryOptional.isEmpty() || !currentUser.getId().equals(diaryEntryOptional.get().getUserId())) {
+            return "redirect:/diary";
         }
 
-        return populateEditForm(model, diaryEntry);
+        return populateEditForm(model, diaryEntryOptional.get());
     }
 
     @PostMapping("/edit")
     public String updateDiaryEntry(@RequestParam Map<String, String> parameters,
                                    @AuthenticationPrincipal DiaryUserDetails currentUser,
                                    Model model) {
-        DiaryEntry oldDiaryEntry = diaryEntryService.get(Integer.valueOf(parameters.get("id"))).orElseThrow();
-        if (!currentUser.getId().equals(oldDiaryEntry.getUserId())) {
-            return "redirect:/login";
+        Integer entryId = Integer.valueOf(parameters.get("id"));
+
+        Optional<DiaryEntry> oldDiaryEntryOptional = diaryEntryService.get(entryId, currentUser.getId());
+        if (oldDiaryEntryOptional.isEmpty() || !currentUser.getId().equals(oldDiaryEntryOptional.get().getUserId())) {
+            return "redirect:/diary";
         }
 
+        DiaryEntry oldDiaryEntry = oldDiaryEntryOptional.get();
         DiaryEntry updatedDiaryEntry = createDiaryEntryObject(parameters, currentUser);
         updatedDiaryEntry.setId(oldDiaryEntry.getId());
         updatedDiaryEntry.setCreatedDate(oldDiaryEntry.getCreatedDate());
@@ -111,8 +116,6 @@ public class DiaryController {
         if (!validateDiaryEntry(updatedDiaryEntry, model)) {
             return populateEditForm(model, updatedDiaryEntry);
         }
-
-        System.out.println("UPDATED DIARYENTRY:" + updatedDiaryEntry);
 
         diaryEntryService.save(updatedDiaryEntry);
         List<Emotion> selectedEmotions = extractSelectedEmotions(parameters);
@@ -198,17 +201,22 @@ public class DiaryController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteDiaryEntry(@PathVariable Integer id) {
-        diaryEntryService.delete(id);
+    public String deleteDiaryEntry(@PathVariable Integer id, @AuthenticationPrincipal DiaryUserDetails currentUser) {
+        diaryEntryService.delete(id, currentUser.getId());
         return "redirect:/diary";
     }
 
 
     @GetMapping("/show/{id}")
-    public String showDiaryEntry(@PathVariable("id") Integer id, Model model) {
-        DiaryEntry diaryEntry = diaryEntryService.get(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid diaryEntry Id: " + id));
-        model.addAttribute("diaryEntry", diaryEntry);
+    public String showDiaryEntry(@PathVariable("id") Integer id, Model model, @AuthenticationPrincipal DiaryUserDetails currentUser) {
+        Optional<DiaryEntry> diaryEntryOptional = diaryEntryService.get(id, currentUser.getId());
+
+        if (diaryEntryOptional.isEmpty() || !currentUser.getId().equals(diaryEntryOptional.get().getUserId())) {
+            return "redirect:/diary";
+        }
+
+        model.addAttribute("diaryEntry", diaryEntryOptional.get());
         return "show";
     }
+
 }
