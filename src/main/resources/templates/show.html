@@ -6,32 +6,26 @@
     <link th:replace="~{fragments :: css}">
 </head>
 <body>
+<div class="main-column">
 <div th:replace="~{fragments :: header}"></div>
 
-<article class="content-box">
+<article class="content-box full-width-content-box">
     <h1 th:text="${diaryEntry.title}">[Title]</h1>
-    <p><strong>Created on:</strong> <span th:text="${diaryEntry.createdDate}">[Date]</span></p>
-
-    <div>
-        <strong>Emotions:</strong>
-        <ul>
-            <li th:each="emotion : ${diaryEntry.emotions}" th:text="${emotion.name}">[Emotion Name]</li>
-        </ul>
+    <div class="list-entry-row">
+        <div class="list-entry-row-item" th:text="${diaryEntry.createdDate}">[Date]</div>
+        <div class="list-entry-row-item" th:each="emotion : ${diaryEntry.emotions}">
+            <div class="entry-emotion" th:text="${emotion.name}">[Emotion Name]</div>
+        </div>
+        <div class="list-entry-row-item" th:each="tag : ${diaryEntry.tags}">
+            <div class="entry-tag" th:text="${tag.name}">[Tag Name]</div>
+        </div>
     </div>
 
     <div>
-        <strong>Tags:</strong>
-        <ul>
-            <li th:each="tag : ${diaryEntry.tags}" th:text="${tag.name}">[Tag Name]</li>
-        </ul>
-    </div>
-
-    <div>
-        <strong>Contents:</strong>
         <p th:text="${diaryEntry.content}">[Content]</p>
     </div>
 
-    <div>
+    <div class="entry-action-row">
         <a th:href="@{/diary}" class="button">Back to List</a>
         <a th:href="@{/diary/edit/{id}(id=${diaryEntry.id})}" class="button">Edit</a>
         <a th:href="@{/diary/delete/{id}(id=${diaryEntry.id})}" class="btn btn-danger"
@@ -41,5 +35,6 @@
 </article>
 
 <div th:replace="~{fragments :: footer}"></div>
+</div>
 </body>
 </html>

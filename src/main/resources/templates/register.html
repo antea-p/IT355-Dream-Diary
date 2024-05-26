@@ -6,13 +6,15 @@
     <link th:replace="~{fragments :: css}">
 </head>
 <body>
+<div class="main-column">
 <div th:replace="~{fragments :: header}"></div>
 
 <div class="content-box">
     <form name="f" th:action="@{/register}" th:object="${registrationCommand}" method="post">
-        <fieldset class="register-fieldset">
+        <h1 class="page-title">𝓡𝓮𝓰𝓲𝓼𝓽𝓮𝓻</h1>
+        <a href="/register">Already have an account? Log in here!</a>
 
-            <legend>Register</legend>
+        <fieldset class="register-fieldset">
             <div th:if="${error}" class="alert alert-error">
                 <p th:text="${error}"></p>
             </div>
@@ -43,5 +45,6 @@
 </div>
 
 <div th:replace="~{fragments :: footer}"></div>
+</div>
 </body>
 </html>

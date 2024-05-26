@@ -22,7 +22,7 @@ public class SecurityConfiguration {
         http
                 //.addFilterAfter(new LoggingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/*.css", "/*.png", "/*.jpg", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/*.css", "/*.png", "/*.jpg", "/*.gif", "/favicon.ico").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
