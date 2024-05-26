@@ -11,7 +11,7 @@ public class DiaryUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
-    private Integer id; // TODO: možda Long, treba vidjeti
+    private Integer id;
 
     @Column(name = "username", nullable = false, length = 50)
     private String username;

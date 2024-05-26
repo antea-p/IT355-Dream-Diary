@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// TODO: make it so that changing title or content doesn't affect listing order
 @Controller
 @RequestMapping("/diary")
 public class DiaryController {
@@ -44,7 +43,7 @@ public class DiaryController {
                                 Model model) {
         List<DiaryEntry> diaryEntries;
 
-        DiaryEntrySortingCriteria criteria = sortBy == null ? null : DiaryEntrySortingCriteria.valueOf(sortBy.toUpperCase());
+        DiaryEntrySortingCriteria criteria = sortBy == null ? DiaryEntrySortingCriteria.CREATEDDATE : DiaryEntrySortingCriteria.valueOf(sortBy.toUpperCase());
         Sort.Direction direction = sortDir == null ? Sort.Direction.ASC : Sort.Direction.valueOf(sortDir.toUpperCase());
         diaryEntries = diaryEntryService.list(currentUser.getId(), direction, criteria, title);
 
