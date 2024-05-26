@@ -35,23 +35,16 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testShowAdminPage() {
-        when(mockDiaryUserDetailsService.getAllUsernames()).thenReturn(List.of("User1", "User2", "User3"));
-        when(mockDiaryEntryService.getDiaryEntryCountByUser()).thenReturn(Map.of("User1", 5, "User2", 3, "User3", 7));
+        when(mockDiaryUserDetailsService.getAllUsernames()).thenReturn(List.of("sunny", "omori", "tommy", "sonic"));
+        when(mockDiaryEntryService.getDiaryEntryCountByUser()).thenReturn(Map.of("sunny", 5, "omori", 3, "tommy", 7, "sonic", 2));
         when(mockEmotionService.getEmotionUsageCount()).thenReturn(Map.of("Happy", 10L, "Sad", 5L));
 
         assertThat(adminController.showAdminPage(model)).isEqualTo("admin");
-        verify(model).addAttribute("users", List.of("User1", "User2", "User3"));
-        verify(model).addAttribute("diaryEntriesStatistics", Map.of("User1", 5, "User2", 3, "User3", 7));
+        verify(model).addAttribute("users", List.of("sunny", "omori", "tommy", "sonic"));
+        verify(model).addAttribute("diaryEntriesStatistics", Map.of("sunny", 5, "omori", 3, "tommy", 7, "sonic", 2));
         verify(model).addAttribute("emotionStatistics", Map.of("Happy", 10L, "Sad", 5L));
     }
 
-    @Test
-    void testGetAllUsernames_ReturnsCorrectList() {
-        when(mockDiaryUserDetailsService.getAllUsernames()).thenReturn(List.of("Alice", "Bob", "Charlie"));
-
-        List<String> usernames = mockDiaryUserDetailsService.getAllUsernames();
-        assertThat(usernames).containsExactly("Alice", "Bob", "Charlie");
-    }
 
     @Test
     void testGetDiaryCountByUser_ReturnsEmptyMapIfNoUsers() {
