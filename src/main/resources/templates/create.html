@@ -32,7 +32,6 @@
 
             <div class="form-group">
                 <strong>Emotions:</strong>
-                <!-- TODO: hidden ul-->
                 <ul>
                     <li th:each="emotion : ${emotions}">
                         <input type="checkbox" th:attr="id='emotion_' + ${emotion.id}, name='emotion_' + ${emotion.id}"

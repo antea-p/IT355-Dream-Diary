@@ -12,10 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Integer> {
-    // TODO: first two methods are probably redundant now
     List<DiaryEntry> findAll(Sort sort);
-
-    List<DiaryEntry> findByTitleContainingIgnoreCase(String title, Sort sort);
 
     @Query("SELECT COUNT(diary_entry) FROM DiaryEntry diary_entry WHERE diary_entry.userId = :userId")
     int countByUserId(@Param("userId") Integer userId);

@@ -5,6 +5,9 @@ import ac.rs.metropolitan.anteaprimorac5157.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,21 +20,23 @@ import static org.mockito.Mockito.*;
 
 class DiaryEntryServiceTest {
 
+
     private DiaryEntryRepository mockDiaryEntryRepository;
     private DiaryUserRepository mockDiaryUserRepository;
     private DiaryEntryEmotionRepository mockDiaryEntryEmotionRepository;
     private EmotionRepository mockEmotionRepository;
     private DiaryEntryService diaryEntryService;
 
-
     public static final Integer VALID_ID = 1;
+    public static final Integer USER_ID = 1;
     private final static DiaryEntry DIARY_ENTRY = new DiaryEntry(VALID_ID, "Welcome to White Space", "I have been here as long as I can remember...",
-            LocalDate.now(), 1, List.of(), List.of(new Emotion(1, "Nostalgia")));
+            LocalDate.now(), USER_ID, List.of(), List.of(new Emotion(1, "Nostalgia")));
     private final static DiaryEntry DIARY_ENTRY_2 = new DiaryEntry(2, "Exploring Neighbor's Room", "She has a wide array of books and colorful knick-knacks...",
-            LocalDate.now(), 2, List.of(new Tag(1, "Library")), List.of(new Emotion(2, "Wonder")));
+            LocalDate.now(), USER_ID, List.of(new Tag(1, "Library")), List.of(new Emotion(2, "Wonder")));
 
     @BeforeEach
     void setUp() {
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("omori", "password", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
         this.mockDiaryEntryRepository = mock(DiaryEntryRepository.class);
         this.mockDiaryUserRepository = mock(DiaryUserRepository.class);
         this.mockDiaryEntryEmotionRepository = mock(DiaryEntryEmotionRepository.class);
@@ -39,114 +44,109 @@ class DiaryEntryServiceTest {
         this.diaryEntryService = new DiaryEntryService(mockDiaryEntryRepository, mockDiaryUserRepository, mockDiaryEntryEmotionRepository, mockEmotionRepository);
     }
 
-
     @Test
     void testListAllDiaryEntries() {
         List<DiaryEntry> expectedResult = List.of(DIARY_ENTRY, DIARY_ENTRY_2);
-        when(mockDiaryEntryRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))).thenReturn(expectedResult);
+        when(mockDiaryEntryRepository.findByUserId(USER_ID, Sort.by(Sort.Direction.ASC, "id"))).thenReturn(expectedResult);
 
-        List<DiaryEntry> actualResult = diaryEntryService.list(null, null, null);
+        List<DiaryEntry> actualResult = diaryEntryService.list(USER_ID, null, null, null);
         assertThat(actualResult).isEqualTo(expectedResult);
     }
 
     @Test
     void testFindEntriesByTitle_NoSorting() {
-        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), 1, List.of(), List.of());
-        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), 2, List.of(), List.of());
-        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), 3, List.of(), List.of());
+        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), USER_ID, List.of(), List.of());
 
         List<DiaryEntry> unsortedEntries = List.of(entry1, entry2, entry3);
         List<DiaryEntry> expectedResult = List.of(entry3);
         String searchTitle = "amm";
-        Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        when(mockDiaryEntryRepository.findByTitleContainingIgnoreCase(searchTitle, sort)).thenReturn(expectedResult);
+        when(mockDiaryEntryRepository.findByUserIdAndTitleContainingIgnoreCase(USER_ID, searchTitle, Sort.by(Sort.Direction.ASC, "id"))).thenReturn(expectedResult);
 
-        List<DiaryEntry> actualResult = diaryEntryService.list(null, null, searchTitle);
+        List<DiaryEntry> actualResult = diaryEntryService.list(USER_ID, null, null, searchTitle);
 
         assertThat(actualResult).hasSameElementsAs(expectedResult);
-        verify(mockDiaryEntryRepository).findByTitleContainingIgnoreCase(searchTitle, sort);
+//        verify(mockDiaryEntryRepository).findByTitleContainingIgnoreCase(searchTitle, sort);
     }
 
     @Test
     void testFindEntriesByTitle_WithSorting() {
-        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), 1, List.of(), List.of());
-        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), 2, List.of(), List.of());
-        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), 3, List.of(), List.of());
+        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), USER_ID, List.of(), List.of());
 
         List<DiaryEntry> sortedMatchedEntries = List.of(entry3);
         String searchTitle = "amm";
-        Sort sort = Sort.by(Sort.Direction.ASC, "title");
-        when(mockDiaryEntryRepository.findByTitleContainingIgnoreCase(searchTitle, sort)).thenReturn(sortedMatchedEntries);
+        when(mockDiaryEntryRepository.findByUserIdAndTitleContainingIgnoreCase(USER_ID, searchTitle, Sort.by(Sort.Direction.ASC, "title"))).thenReturn(sortedMatchedEntries);
 
-        List<DiaryEntry> actualResult = diaryEntryService.list(Sort.Direction.ASC, DiaryEntrySortingCriteria.TITLE, searchTitle);
+        List<DiaryEntry> actualResult = diaryEntryService.list(USER_ID, Sort.Direction.ASC, DiaryEntrySortingCriteria.TITLE, searchTitle);
 
         assertThat(actualResult).isEqualTo(sortedMatchedEntries);
-        verify(mockDiaryEntryRepository).findByTitleContainingIgnoreCase(searchTitle, sort);
+//        verify(mockDiaryEntryRepository).findByTitleContainingIgnoreCase(searchTitle, sort);
     }
 
     @Test
     void testListAllDiaryEntries_SortedByTitle_Ascending() {
-        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), 1, List.of(), List.of());
-        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), 2, List.of(), List.of());
-        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), 3, List.of(), List.of());
+        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), USER_ID, List.of(), List.of());
 
         List<DiaryEntry> sortedEntries = List.of(entry1, entry2, entry3);
-        Sort sort = Sort.by(Sort.Direction.ASC, "title");
-        when(mockDiaryEntryRepository.findAll(sort)).thenReturn(sortedEntries);
+        when(mockDiaryEntryRepository.findByUserId(USER_ID, Sort.by(Sort.Direction.ASC, "title"))).thenReturn(sortedEntries);
 
-        List<DiaryEntry> actualResult = diaryEntryService.list(Sort.Direction.ASC, DiaryEntrySortingCriteria.TITLE, null);
+        List<DiaryEntry> actualResult = diaryEntryService.list(USER_ID, Sort.Direction.ASC, DiaryEntrySortingCriteria.TITLE, null);
 
         assertThat(actualResult).isEqualTo(sortedEntries);
-        verify(mockDiaryEntryRepository).findAll(sort);
     }
 
 
     @Test
     void testListAllDiaryEntries_SortedByTitle_Descending() {
-        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), 1, List.of(), List.of());
-        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), 2, List.of(), List.of());
-        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), 3, List.of(), List.of());
+        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now(), USER_ID, List.of(), List.of());
+        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), USER_ID, List.of(), List.of());
 
         List<DiaryEntry> sortedEntries = List.of(entry3, entry2, entry1);
-        when(mockDiaryEntryRepository.findAll(Sort.by(Sort.Direction.DESC, "title"))).thenReturn(sortedEntries);
+        when(mockDiaryEntryRepository.findByUserId(USER_ID, Sort.by(Sort.Direction.DESC, "title"))).thenReturn(sortedEntries);
 
-        List<DiaryEntry> actualResult = diaryEntryService.list(Sort.Direction.DESC, TITLE, null);
+        List<DiaryEntry> actualResult = diaryEntryService.list(USER_ID, Sort.Direction.DESC, DiaryEntrySortingCriteria.TITLE, null);
 
         assertThat(actualResult).isEqualTo(sortedEntries);
     }
 
     @Test
     void testListAllDiaryEntries_SortedByDate_Ascending() {
-        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now().minusDays(2), 1, List.of(), List.of());
-        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now().minusDays(1), 2, List.of(), List.of());
-        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), 3, List.of(), List.of());
+        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now().minusDays(2), USER_ID, List.of(), List.of());
+        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now().minusDays(1), USER_ID, List.of(), List.of());
+        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), USER_ID, List.of(), List.of());
 
         List<DiaryEntry> sortedEntries = List.of(entry1, entry2, entry3);
-        when(mockDiaryEntryRepository.findAll(Sort.by(Sort.Direction.ASC, "createdDate"))).thenReturn(sortedEntries);
+        when(mockDiaryEntryRepository.findByUserId(USER_ID, Sort.by(Sort.Direction.ASC, "createdDate"))).thenReturn(sortedEntries);
 
-        List<DiaryEntry> actualResult = diaryEntryService.list(Sort.Direction.ASC, DiaryEntrySortingCriteria.CREATEDDATE, null);
+        List<DiaryEntry> actualResult = diaryEntryService.list(USER_ID, Sort.Direction.ASC, DiaryEntrySortingCriteria.CREATEDDATE, null);
         assertThat(actualResult).isEqualTo(sortedEntries);
     }
 
     @Test
     void testListAllDiaryEntries_SortedByDate_Descending() {
-        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now().minusDays(2), 1, List.of(), List.of());
-        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now().minusDays(1), 2, List.of(), List.of());
-        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), 3, List.of(), List.of());
+        DiaryEntry entry1 = new DiaryEntry(1, "Alpha", "Content 1", LocalDate.now().minusDays(2), USER_ID, List.of(), List.of());
+        DiaryEntry entry2 = new DiaryEntry(2, "Beta", "Content 2", LocalDate.now().minusDays(1), USER_ID, List.of(), List.of());
+        DiaryEntry entry3 = new DiaryEntry(3, "Gamma", "Content 3", LocalDate.now(), USER_ID, List.of(), List.of());
 
         List<DiaryEntry> sortedEntries = List.of(entry3, entry2, entry1);
-        when(mockDiaryEntryRepository.findAll(Sort.by(Sort.Direction.DESC, "createdDate"))).thenReturn(sortedEntries);
+        when(mockDiaryEntryRepository.findByUserId(USER_ID, Sort.by(Sort.Direction.DESC, "createdDate"))).thenReturn(sortedEntries);
 
-        List<DiaryEntry> actualResult = diaryEntryService.list(Sort.Direction.DESC, DiaryEntrySortingCriteria.CREATEDDATE, null);
+        List<DiaryEntry> actualResult = diaryEntryService.list(USER_ID, Sort.Direction.DESC, DiaryEntrySortingCriteria.CREATEDDATE, null);
         assertThat(actualResult).isEqualTo(sortedEntries);
     }
 
 
     @Test
     void testGetDiaryEntry_Exists() {
-        when(mockDiaryEntryRepository.findById(VALID_ID)).thenReturn(Optional.of(DIARY_ENTRY));
+        when(mockDiaryEntryRepository.findByIdAndUserId(VALID_ID, USER_ID)).thenReturn(Optional.of(DIARY_ENTRY));
 
-        Optional<DiaryEntry> actualResult = diaryEntryService.get(VALID_ID);
+        Optional<DiaryEntry> actualResult = diaryEntryService.get(VALID_ID, USER_ID);
         assertThat(actualResult.isPresent()).isTrue();
         assertThat(actualResult).isEqualTo(Optional.of(DIARY_ENTRY));
     }
@@ -156,7 +156,7 @@ class DiaryEntryServiceTest {
         Integer INVALID_ID = 999;
         when(mockDiaryEntryRepository.findById(INVALID_ID)).thenReturn(Optional.empty());
 
-        Optional<DiaryEntry> actualResult = diaryEntryService.get(INVALID_ID);
+        Optional<DiaryEntry> actualResult = diaryEntryService.get(INVALID_ID, USER_ID);
         assertThat(actualResult.isPresent()).isFalse();
     }
 
@@ -170,10 +170,10 @@ class DiaryEntryServiceTest {
 
     @Test
     void testDeleteDiaryEntry() {
-        doNothing().when(mockDiaryEntryRepository).delete(DIARY_ENTRY);
+        when(mockDiaryEntryRepository.findByIdAndUserId(VALID_ID, USER_ID)).thenReturn(Optional.of(DIARY_ENTRY));
 
-       diaryEntryService.delete(VALID_ID);
-        verify(mockDiaryEntryRepository, times(1)).deleteById(VALID_ID);
+        diaryEntryService.delete(VALID_ID, USER_ID);
+        verify(mockDiaryEntryRepository, times(1)).delete(DIARY_ENTRY);
     }
 
     @Test

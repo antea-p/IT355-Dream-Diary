@@ -18,7 +18,6 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // TODO: hijerarhijski poredak filtera requestMatchers od najstrožeg do endpointa dostupnih svima
         http
                 //.addFilterAfter(new LoggingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
@@ -28,7 +27,7 @@ public class SecurityConfiguration {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")  // Custom login stranica
-                        .defaultSuccessUrl("/", true) // TODO: po potrebi promijeniti URL
+                        .defaultSuccessUrl("/", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

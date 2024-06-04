@@ -34,7 +34,6 @@ class LoginControllerTest {
         SecurityContextHolder.clearContext();
     }
 
-    // TODO: verify later, and add more tests if needed
     @Test
     void testShowLoginForm() {
         when(mockSecurityContext.getAuthentication()).thenReturn(null);

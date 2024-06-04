@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
-// TODO: kasnije kreirati interfejs korištenjem opcije Extract. Isto važi za druge servise.
 @Service
 public class RegistrationService {
 
@@ -28,7 +27,6 @@ public class RegistrationService {
     }
 
     public UserDetails register(RegistrationCommand command) throws RegistrationFailedException {
-        // TODO: refactor
         String username = command.getUsername();
         String password = command.getPassword();
         String repeatPassword = command.getRepeatPassword();

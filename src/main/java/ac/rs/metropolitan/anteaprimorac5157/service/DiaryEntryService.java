@@ -83,7 +83,6 @@ public class DiaryEntryService {
                 .collect(Collectors.toList());
     }
 
-    // TODO: improve performance for this and similar methods using JOIN fetch
     public Map<String, Integer> getDiaryEntryCountByUser() {
         List<DiaryUser> users = diaryUserRepository.findAll();
         Map<String, Integer> diaryCountByUser = new HashMap<>();

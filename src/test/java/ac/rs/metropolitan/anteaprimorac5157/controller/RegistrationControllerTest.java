@@ -57,7 +57,6 @@ class RegistrationControllerTest {
     }
 
 
-    // TODO: verify later, and add more tests if needed
     @Test
     void testShowRegistationForm() {
         when(mockSecurityContext.getAuthentication()).thenReturn(null);

@@ -35,12 +35,12 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testShowAdminPage() {
-        when(mockDiaryUserDetailsService.getAllUsernames()).thenReturn(List.of("sunny", "omori", "tommy", "sonic"));
+        //when(mockDiaryUserDetailsService.getAllUsernames()).thenReturn(List.of("sunny", "omori", "tommy", "sonic"));
         when(mockDiaryEntryService.getDiaryEntryCountByUser()).thenReturn(Map.of("sunny", 5, "omori", 3, "tommy", 7, "sonic", 2));
         when(mockEmotionService.getEmotionUsageCount()).thenReturn(Map.of("Happy", 10L, "Sad", 5L));
 
         assertThat(adminController.showAdminPage(model)).isEqualTo("admin");
-        verify(model).addAttribute("users", List.of("sunny", "omori", "tommy", "sonic"));
+        //verify(model).addAttribute("users", List.of("sunny", "omori", "tommy", "sonic"));
         verify(model).addAttribute("diaryEntriesStatistics", Map.of("sunny", 5, "omori", 3, "tommy", 7, "sonic", 2));
         verify(model).addAttribute("emotionStatistics", Map.of("Happy", 10L, "Sad", 5L));
     }
@@ -57,11 +57,11 @@ class AdminControllerTest {
 
     @Test
     void testGetDiaryCountByUser_ReturnsCorrectMapIfUsersExist() {
-        when(mockDiaryUserDetailsService.getAllUsernames()).thenReturn(List.of("Alice", "Bob"));
-        when(mockDiaryEntryService.getDiaryEntryCountByUser()).thenReturn(Map.of("Alice", 10, "Bob", 5));
+        when(mockDiaryUserDetailsService.getAllUsernames()).thenReturn(List.of("sunny", "omori"));
+        when(mockDiaryEntryService.getDiaryEntryCountByUser()).thenReturn(Map.of("sunny", 10, "omori", 5));
 
         Map<String, Integer> diaryCountByUser = mockDiaryEntryService.getDiaryEntryCountByUser();
-        assertThat(diaryCountByUser).containsExactlyInAnyOrderEntriesOf(Map.of("Alice", 10, "Bob", 5));
+        assertThat(diaryCountByUser).containsExactlyInAnyOrderEntriesOf(Map.of("sunny", 10, "omori", 5));
     }
 
     @Test

@@ -9,7 +9,6 @@ import java.util.*;
 @Table(name = "diary_entries", schema = "dream_diary")
 public class DiaryEntry {
 
-    // TODO: Long ID za ovaj i za druge entitete, AKO bude trebalo.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "entry_id", nullable = false)
