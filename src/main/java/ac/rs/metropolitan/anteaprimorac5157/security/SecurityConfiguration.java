@@ -6,24 +6,28 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.util.logging.Logger;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private static final Logger LOG = Logger.getLogger(SecurityConfiguration.class.getName());
+    private final AccessDeniedHandler customAccessDeniedHandler;
+
+    public SecurityConfiguration(CustomAccessDeniedHandler customAccessDeniedHandler) {
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                //.addFilterAfter(new LoggingFilter(), UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/*.css", "/*.png", "/*.jpg", "/*.gif", "/favicon.ico").permitAll()
+        http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/diary/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/", "/*.css", "/*.png", "/*.jpg", "/*.gif", "/favicon.ico").permitAll()
+                        .anyRequest().denyAll()
+
                 )
                 .formLogin(form -> form
                         .loginPage("/login")  // Custom login stranica
@@ -36,7 +40,10 @@ public class SecurityConfiguration {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                .csrf(csrf -> csrf.disable());
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
+                .csrf(csrf -> csrf.disable()); // TODO: Promijeniti prije stavljanja u produkciju!
 
         return http.build();
     }

@@ -55,6 +55,6 @@ class LoginControllerTest {
                 new DiaryUser("username", "password", false)
         );
 
-        assertThat(loginController.showLogin()).isEqualTo("redirect:/");
+        assertThat(loginController.showLogin()).isEqualTo("redirect:/diary");
     }
 }

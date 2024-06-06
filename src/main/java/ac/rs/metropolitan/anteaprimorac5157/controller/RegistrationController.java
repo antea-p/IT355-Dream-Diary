@@ -33,7 +33,7 @@ public class RegistrationController {
     public String showRegister(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            return "redirect:/";
+            return "redirect:/diary";
         }
         model.addAttribute("registrationCommand", new RegistrationCommand());
         return "register";

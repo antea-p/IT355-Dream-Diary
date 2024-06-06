@@ -76,7 +76,7 @@ class RegistrationControllerTest {
                 new DiaryUser("omori", "password", false)
         );
 
-        assertThat(registrationController.showRegister(mockModel)).isEqualTo("redirect:/");
+        assertThat(registrationController.showRegister(mockModel)).isEqualTo("redirect:/diary");
     }
 
 

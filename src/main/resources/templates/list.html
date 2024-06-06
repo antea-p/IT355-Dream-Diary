@@ -37,6 +37,14 @@
         </form>
 
         <div>
+            <div class="list-entry">
+                <h2>
+                    <a href="/diary/create" class="button">
+                        <span class="hand"></span>
+                        Create New Entry
+                    </a>
+                </h2>
+            </div>
             <div th:each="entry : ${diaryEntries}" class="list-entry">
                 <h2>
                     <span class="hand"></span>
@@ -55,14 +63,7 @@
                     >>> <span th:text="${#strings.abbreviate(entry.content, 128)} + '...'">[Content]</span>
                 </div>
             </div>
-            <div class="list-entry">
-                <h2>
-                    <a href="/diary/create" class="button">
-                        <span class="hand"></span>
-                        Create New Entry
-                    </a>
-                </h2>
-            </div>
+
         </div>
 
 

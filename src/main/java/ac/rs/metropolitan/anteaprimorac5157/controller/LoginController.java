@@ -14,7 +14,7 @@ public class LoginController {
     public String showLogin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
-            return "redirect:/";
+            return "redirect:/diary";
         }
         return "login";
     }
